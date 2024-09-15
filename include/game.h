@@ -2,8 +2,7 @@
 
 #include <unordered_map>
 
-#include "components/physics_component.h"
-#include "components/render_component.h"
+#include "components.h"
 #include "input_handler.h"
 
 namespace platformer2d {

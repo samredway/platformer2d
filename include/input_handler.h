@@ -19,10 +19,10 @@ class InputHandler {
   bool isDown() const { return is_down_; }
 
  private:
-  bool is_up_ = false;
-  bool is_down_ = false;
-  bool is_left_ = false;
-  bool is_right_ = false;
+  bool is_up_{false};
+  bool is_down_{false};
+  bool is_left_{false};
+  bool is_right_{false};
 };
 
 }  // namespace platformer2d
