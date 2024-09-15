@@ -3,14 +3,14 @@
 #include <cstdlib>  // For std::abort
 #include <iostream>
 
-#define CHECK(condition)                                                \
-  do {                                                                  \
-    if (!(condition)) {                                                 \
-      std::cerr << "Check failed: " << #condition << " in " << __FILE__ \
-                << " at line " << __LINE__ << std::endl;                \
-      std::abort();                                                     \
-    }                                                                   \
-  } while (false);
+#define CHECK(condition, errstring)                                    \
+  do {                                                                 \
+    if (!(condition)) {                                                \
+      std::cerr << "Check failed: " << errstring << " in " << __FILE__ \
+                << " at line " << __LINE__ << std::endl;               \
+      std::abort();                                                    \
+    }                                                                  \
+  } while (false)
 
 #ifndef NDEBUG
 #define DCHECK(condition) CHECK(condition)
