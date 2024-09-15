@@ -17,3 +17,12 @@
 #else
 #define DCHECK(condition) ((void)0)  // No-op in release builds
 #endif
+
+#ifndef NDEBUG
+#define DLOG(message)                  \
+  do {                                 \
+    std::cout << message << std::endl; \
+  } while (false)
+#else
+#define DLOG(message) ((void)0)
+#endif

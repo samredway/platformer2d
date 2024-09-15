@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "game.h"
 #include "input_handler.h"
+#include "macros.h"
 #include "raylib.h"
 
 namespace platformer2d {
@@ -47,11 +48,14 @@ void Game::handleInput() {
   // Would crash if player not defined somehow
   auto& player_physics{physics_components_.at(playerTag)};
 
+  input_handler_.getInput();
   if (input_handler_.isRight()) {
+    DLOG("Pressed right");
     player_physics.acceleration_x +=
         player_physics.walk_force / player_physics.mass;
   }
   if (input_handler_.isLeft()) {
+    DLOG("Pressed left");
     player_physics.acceleration_x -=
         player_physics.walk_force / player_physics.mass;
   }
@@ -71,12 +75,14 @@ void Game::processRendering() const {
 }
 
 void Game::processPhysics() {
-  // auto dt = GetFrameTime();
-  // for (auto& physics_pair : physics_components_) {
-  //   auto physics = physics_pair.second;
-  // Update velocity based on acceleration where v = v + at
-  // const float velocity_x =
-  //     physics.getVelocityX() + (physics.getAccelleration() * dt)
+  float dt{GetFrameTime()};
+  for (auto& physics_pair : physics_components_) {
+    auto& physics = physics_pair.second;
+    // Update velocity based on acceleration where v = v + at
+    physics.velocity_x += physics.acceleration_x * dt;
+    // Update position based on velocity
+    physics.position_x += physics.velocity_x * dt;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

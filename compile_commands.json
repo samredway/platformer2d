@@ -8,14 +8,16 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-g",
+      "-O0",
       "-c",
       "-o",
-      "build/components/physics_component.o",
-      "src/components/physics_component.cpp"
+      "build/input_handler.o",
+      "src/input_handler.cpp"
     ],
     "directory": "/Users/samredway/development/cpp/games/platformer2d",
-    "file": "/Users/samredway/development/cpp/games/platformer2d/src/components/physics_component.cpp",
-    "output": "/Users/samredway/development/cpp/games/platformer2d/build/components/physics_component.o"
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/input_handler.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/input_handler.o"
   },
   {
     "arguments": [
@@ -26,6 +28,8 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-g",
+      "-O0",
       "-c",
       "-o",
       "build/main.o",
@@ -44,6 +48,8 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-g",
+      "-O0",
       "-c",
       "-o",
       "build/game.o",

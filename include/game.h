@@ -18,10 +18,9 @@ class Game {
   void handleInput();
   void processRendering() const;
   void processPhysics();
-
   const int screen_width_;
   const int screen_height_;
-  const InputHandler input_handler_;
+  InputHandler input_handler_;
 
   // Systems are just collections of components right now with their
   // own processor method (these probably get moved out to scenes or
