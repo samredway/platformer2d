@@ -15,14 +15,12 @@ Game::Game(int width, int height)
   InitWindow(screen_width_, screen_height_, "2D Platform Game");
   SetTargetFPS(kTargetFPS);
 
-  // Initialse entities //////////////////////////////////////////////////////
+  // Initialise entities //////////////////////////////////////////////////////
 
   // initialise player components
   physics_components_.emplace(
       std::string(playerTag),
       PhysicsComponent((float)width / 2, (float)height / 2));
-
-  //
 }
 
 Game::~Game() {
