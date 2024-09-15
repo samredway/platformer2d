@@ -2,13 +2,16 @@
 
 namespace platformer2d {
 
-PhysicsComponent::PhysicsComponent(float x, float y, float mass)
+PhysicsComponent::PhysicsComponent(float x, float y, int width, int height,
+                                   float mass)
     : position_x_(x),
       position_y_(y),
       velocity_x_(0),
       velocity_y_(0),
       acceleration_x_(0),
       acceleration_y_(0),
+      width_(width),
+      height_(height),
       mass_(mass) {
 }
 

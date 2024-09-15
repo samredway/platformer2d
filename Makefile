@@ -14,8 +14,16 @@ OBJS = $(patsubst src/%.cpp, build/%.o, $(SRCS))
 # Target binary
 TARGET = bin/game
 
-# Rule to build the project
-all: $(TARGET)
+# Default build is a debug build
+all: debug
+
+# Debug build
+debug: CXXFLAGS += -g -O0  # Debug symbols, no optimization
+debug: $(TARGET)
+
+# Release build
+release: CXXFLAGS += -O2 -DNDEBUG  # Optimization, disable assertions
+release: $(TARGET)
 
 # Linking the object files to create the binary
 $(TARGET): $(OBJS)
@@ -32,5 +40,5 @@ build/%.o: src/%.cpp
 clean:
 	rm -rf build/ bin/
 
-# Mark the `all` and `clean` as phony targets
-.PHONY: all clean
+# Mark the `all`, `clean`, `debug`, and `release` as phony targets
+.PHONY: all clean debug release
