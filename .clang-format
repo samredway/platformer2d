@@ -1,0 +1,11 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ColumnLimit: 80
+AllowShortFunctionsOnASingleLine: InlineOnly
+DerivePointerAlignment: false
+PointerAlignment: Left
+SeparateDefinitionBlocks: Always  # Requires clang-format 14+
+SortIncludes: true
+BreakBeforeBraces: Attach
+SpacesInParentheses: false
+SpaceBeforeParens: ControlStatements
