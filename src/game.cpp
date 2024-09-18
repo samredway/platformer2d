@@ -96,21 +96,17 @@ void Game::processPhysics() {
   float dt{GetFrameTime()};
   for (auto& movement_pair : movement_components_) {
     auto& movement{movement_pair.second};
-    processPhysicsX(dt, movement);
-    processPhysicsY(dt, movement);
 
     // Find the new position so can check for collisions before updating the
     // component
     PositionComponent& position{position_components_.at(movement_pair.first)};
-    const float new_position_x{position.position_x + movement.velocity_x * dt};
-    const float new_position_y{position.position_y + movement.velocity_y * dt};
-    const Rectangle mover_rect{new_position_x, new_position_y,
+    const Rectangle mover_rect{position.position_x, position.position_y,
                                (float)position.width, (float)position.height};
 
     // Check collisions.
     bool colliding{false};
 
-    // - check whether collision occured by checking the colltion rectangle
+    // - check whether collision occured by checking the collision rectangle
     //   for the moving object against all collidables
     for (auto& collider_pair : collision_components_) {
       // Obv the mover cannot collide with itself
@@ -126,22 +122,18 @@ void Game::processPhysics() {
     }
 
     // - if collision occurs then need to check in what direction the
-    // collision
-    //   has occured. Do this by check the object position it collided with
-    //   and calculating the intersection of the objects.
+    //   the object position it collided with and calculate the intersection
+    //   of the objects.
     if (colliding) {
       // TEMP do not update movement
       continue;
     }
 
-    // - movement in the given direction can be cancelled for now - but a
-    // better
-    //   approach is to calculate the opposing force and calculate a new
-    //   direction and accelleration based on an elasticity coefficient that
-    //   the given surface should hold as a component variable
+    processPhysicsX(dt, movement);
+    processPhysicsY(dt, movement);
 
-    position.position_x = new_position_x;
-    position.position_y = new_position_y;
+    position.position_x += movement.velocity_x * dt;
+    position.position_y += movement.velocity_y * dt;
   }
 }
 
