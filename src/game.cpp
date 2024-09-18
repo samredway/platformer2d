@@ -87,8 +87,8 @@ void Game::processRendering() const {
     // configured correctly and should be fixed in development
     auto& position{position_components_.at(entity_tag)};
     const auto& color{render_pair.second.color};
-    DrawRectangle(position.position_x, position.position_y, position.width,
-                  position.height, color);
+    DrawRectangle(position.x, position.y, position.width, position.height,
+                  color);
   }
 }
 
@@ -96,44 +96,33 @@ void Game::processPhysics() {
   float dt{GetFrameTime()};
   for (auto& movement_pair : movement_components_) {
     auto& movement{movement_pair.second};
+    const std::string mover_entity_tag{movement_pair.first};
+    PositionComponent& position{position_components_.at(mover_entity_tag)};
 
-    // Find the new position so can check for collisions before updating the
-    // component
-    PositionComponent& position{position_components_.at(movement_pair.first)};
-    const Rectangle mover_rect{position.position_x, position.position_y,
-                               (float)position.width, (float)position.height};
+    bool colliding_downward{false};
 
     // Check collisions.
-    bool colliding{false};
-
-    // - check whether collision occured by checking the collision rectangle
-    //   for the moving object against all collidables
     for (auto& collider_pair : collision_components_) {
       // Obv the mover cannot collide with itself
-      if (collider_pair.first == movement_pair.first) continue;
-      const PositionComponent collider_position{
-          position_components_.at(collider_pair.first)};
-      const Rectangle collider_rect{
-          collider_position.position_x, collider_position.position_y,
-          (float)collider_position.width, (float)collider_position.height};
-      if (CheckCollisionRecs(mover_rect, collider_rect)) {
-        colliding = true;
+      if (collider_pair.first == mover_entity_tag) continue;
+      const auto& position2{position_components_.at(collider_pair.first)};
+
+      // Check for downward collision if player is at rest or moving down
+      if (movement.velocity_y >= 0 &&
+          position.x <= position2.x + position2.width &&
+          position.x + position.width >= position2.x &&
+          position.y + position.height >= position2.y) {
+        colliding_downward = true;
       }
     }
 
-    // - if collision occurs then need to check in what direction the
-    //   the object position it collided with and calculate the intersection
-    //   of the objects.
-    if (colliding) {
-      // TEMP do not update movement
-      continue;
-    }
-
     processPhysicsX(dt, movement);
-    processPhysicsY(dt, movement);
+    position.x += movement.velocity_x * dt;
 
-    position.position_x += movement.velocity_x * dt;
-    position.position_y += movement.velocity_y * dt;
+    if (!colliding_downward || movement.velocity_y < 0) {
+      processPhysicsY(dt, movement);
+      position.y += movement.velocity_y * dt;
+    }
   }
 }
 

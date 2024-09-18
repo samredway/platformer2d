@@ -7,8 +7,8 @@ namespace platformer2d {
 struct CollisionComponent {};
 
 struct PositionComponent {
-  float position_x;
-  float position_y;
+  float x;
+  float y;
   int width;
   int height;
 };
