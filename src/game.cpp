@@ -59,22 +59,18 @@ void Game::handleInput() {
 
   // Accelerate in direction pressed.
   // If nothing pressed then decellerate unless at rest then stop
+  const float kRateAcceleration{player_movement.walk_force /
+                                player_movement.mass};
   if (input_handler_.isRight()) {
-    player_movement.acceleration_x =
-        player_movement.walk_force / player_movement.mass;
+    // Accelerate right
+    player_movement.acceleration_x = kRateAcceleration;
   } else if (input_handler_.isLeft()) {
-    player_movement.acceleration_x =
-        -(player_movement.walk_force / player_movement.mass);
+    // Accelerate left
+    player_movement.acceleration_x = -kRateAcceleration;
   } else {
-    if (player_movement.velocity_x > 0) {
-      player_movement.acceleration_x =
-          -(player_movement.walk_force / player_movement.mass);
-    } else if (player_movement.velocity_x < 0) {
-      player_movement.acceleration_x =
-          player_movement.walk_force / player_movement.mass;
-    } else {
-      player_movement.acceleration_x = 0;
-    }
+    player_movement.acceleration_x = 0;
+    // Artbitrary decelleration rate
+    player_movement.velocity_x *= 0.90;
   }
 }
 
@@ -99,7 +95,7 @@ void Game::processPhysics() {
     const std::string mover_entity_tag{movement_pair.first};
     PositionComponent& position{position_components_.at(mover_entity_tag)};
 
-    bool colliding_downward{false};
+    float colliding_downward_y = 0;
 
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
@@ -112,16 +108,19 @@ void Game::processPhysics() {
           position.x <= position2.x + position2.width &&
           position.x + position.width >= position2.x &&
           position.y + position.height >= position2.y) {
-        colliding_downward = true;
+        colliding_downward_y = position2.y;
       }
     }
 
     processPhysicsX(dt, movement);
     position.x += movement.velocity_x * dt;
 
-    if (!colliding_downward || movement.velocity_y < 0) {
+    if (colliding_downward_y == 0 || movement.velocity_y < 0) {
       processPhysicsY(dt, movement);
       position.y += movement.velocity_y * dt;
+    } else {
+      // Adjust mover y location to sit on top of collision object
+      position.y = colliding_downward_y - position.height;
     }
   }
 }
@@ -129,8 +128,10 @@ void Game::processPhysics() {
 void Game::processPhysicsX(float delta_time, MovementComponent& movement) {
   // Update velocity based on acceleration where v = v + at
   movement.velocity_x += movement.acceleration_x * delta_time;
+
   // Apply drag: drag reduces the velocity based on current speed
   movement.velocity_x -= movement.velocity_x * movement.drag * delta_time;
+
   // If no acceleration, apply friction based on the current surface
   if (movement.velocity_x > 0) {
     movement.velocity_x -= movement.friction_coefficient * delta_time;
