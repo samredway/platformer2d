@@ -78,9 +78,6 @@ void Game::handleInput() {
 void Game::processRendering() const {
   for (const auto& render_pair : render_components_) {
     const auto& entity_tag{render_pair.first};
-    // This will throw and crash the program if the position component for this
-    // entity does not exist - which is fine because it means its not
-    // configured correctly and should be fixed in development
     auto& position{position_components_.at(entity_tag)};
     const auto& color{render_pair.second.color};
     DrawRectangle(position.x, position.y, position.width, position.height,
