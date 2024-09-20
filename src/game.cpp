@@ -26,7 +26,7 @@ Game::Game(int width, int height)
   render_components_.emplace(playerTag, RenderComponent{RED});
   collision_components_.emplace(playerTag, CollisionComponent{});
 
-  // Tiles
+  // Floor tiles
   for (int i = 0; i < 8; i++) {
     const std::string tileTag{std::format("tile{}", i)};
     const float x{(width / 2.0f) - ((4.0f - i) * 40)};
@@ -36,7 +36,7 @@ Game::Game(int width, int height)
     collision_components_.emplace(tileTag, CollisionComponent{});
   }
 
-  // central tile to do x collision on
+  // Central tile to do x collision on
   const std::string tileTag{std::format("tile8")};
   const float x{(width / 2.0f) - 20};
   position_components_.emplace(
@@ -71,14 +71,14 @@ void Game::handleInput() {
 
   // Accelerate in direction pressed.
   // If nothing pressed then decellerate unless at rest then stop
-  const float kRateAcceleration{player_movement.walk_force /
-                                player_movement.mass};
+  const float rate_accleration{player_movement.walk_force /
+                               player_movement.mass};
   if (input_handler_.isRight()) {
     // Accelerate right
-    player_movement.acceleration_x = kRateAcceleration;
+    player_movement.acceleration_x = rate_accleration;
   } else if (input_handler_.isLeft()) {
     // Accelerate left
-    player_movement.acceleration_x = -kRateAcceleration;
+    player_movement.acceleration_x = -rate_accleration;
   } else {
     player_movement.acceleration_x = 0;
     // Artbitrary decelleration rate
@@ -106,6 +106,7 @@ void Game::processPhysics() {
 
     float colliding_downward_y = -100;
     float colliding_rightward = -100;
+    float colliding_leftward = -100;
 
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
@@ -121,23 +122,38 @@ void Game::processPhysics() {
         colliding_downward_y = position2.y;
       }
 
+      auto is_colliding_x = [](auto position, auto position2) {
+        return position.y >= position2.y &&
+               position.y <= position2.y + position2.height &&
+               position.x + position.width >= position2.x &&
+               position.x <= position2.x + position2.width;
+      };
+
       // Check for right side direction collision
-      if (movement.velocity_x >= 0 && position.y >= position2.y &&
-          position.y <= position2.y + position2.height &&
-          position.x + position.width >= position2.x &&
-          position.x <= position2.x + position2.width) {
+      if (movement.velocity_x >= 0 && is_colliding_x(position, position2)) {
         colliding_rightward = position2.x;
+      }
+
+      // Check for left side direction collision
+      if (movement.velocity_x <= 0 && is_colliding_x(position, position2)) {
+        colliding_leftward = position2.x + position2.width;
       }
     }
 
-    if (colliding_rightward < 0) {
+    if (colliding_rightward < 0 && colliding_leftward < 0) {
       processPhysicsX(dt, movement);
       position.x += movement.velocity_x * dt;
     } else {
       // implement collisions
-      position.x = colliding_rightward - position.width - 1;
-      movement.velocity_x = 0;
-      movement.acceleration_x = 0;
+      if (colliding_rightward > 0) {
+        position.x = colliding_rightward - position.width - 1;
+        movement.velocity_x = 0;
+        movement.acceleration_x = 0;
+      } else {
+        position.x = colliding_leftward + 1;
+        movement.velocity_x = 0;
+        movement.acceleration_x = 0;
+      }
     }
 
     if (colliding_downward_y < 0 || movement.velocity_y < 0) {
