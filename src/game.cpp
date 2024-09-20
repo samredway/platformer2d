@@ -104,7 +104,8 @@ void Game::processPhysics() {
     const std::string mover_entity_tag{movement_pair.first};
     PositionComponent& position{position_components_.at(mover_entity_tag)};
 
-    float colliding_downward_y = 0;
+    float colliding_downward_y = -100;
+    float colliding_rightward = -100;
 
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
@@ -119,12 +120,27 @@ void Game::processPhysics() {
           position.y + position.height >= position2.y) {
         colliding_downward_y = position2.y;
       }
+
+      // Check for right side direction collision
+      if (movement.velocity_x >= 0 && position.y >= position2.y &&
+          position.y <= position2.y + position2.height &&
+          position.x + position.width >= position2.x &&
+          position.x <= position2.x + position2.width) {
+        colliding_rightward = position2.x;
+      }
     }
 
-    processPhysicsX(dt, movement);
-    position.x += movement.velocity_x * dt;
+    if (colliding_rightward < 0) {
+      processPhysicsX(dt, movement);
+      position.x += movement.velocity_x * dt;
+    } else {
+      // implement collisions
+      position.x = colliding_rightward - position.width - 1;
+      movement.velocity_x = 0;
+      movement.acceleration_x = 0;
+    }
 
-    if (colliding_downward_y == 0 || movement.velocity_y < 0) {
+    if (colliding_downward_y < 0 || movement.velocity_y < 0) {
       processPhysicsY(dt, movement);
       position.y += movement.velocity_y * dt;
     } else {
