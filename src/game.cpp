@@ -27,10 +27,22 @@ Game::Game(int width, int height)
   collision_components_.emplace(playerTag, CollisionComponent{});
 
   // Tiles
+  for (int i = 0; i < 8; i++) {
+    const std::string tileTag{std::format("tile{}", i)};
+    const float x{(width / 2.0f) - ((4.0f - i) * 40)};
+    position_components_.emplace(
+        tileTag, PositionComponent{x, (float)height - 40, 40, 40});
+    render_components_.emplace(tileTag, RenderComponent{BLACK});
+    collision_components_.emplace(tileTag, CollisionComponent{});
+  }
+
+  // central tile to do x collision on
+  const std::string tileTag{std::format("tile8")};
+  const float x{(width / 2.0f) - 20};
   position_components_.emplace(
-      "tile1", PositionComponent{(float)width / 2, (float)height - 40, 40, 40});
-  render_components_.emplace("tile1", RenderComponent{BLACK});
-  collision_components_.emplace("tile1", CollisionComponent{});
+      tileTag, PositionComponent{x, (float)height - 80, 40, 40});
+  render_components_.emplace(tileTag, RenderComponent{BLACK});
+  collision_components_.emplace(tileTag, CollisionComponent{});
 
   /////////////////////////////////////////////////////////////////////////////
 }
