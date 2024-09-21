@@ -201,9 +201,6 @@ void Game::processPhysicsX(float delta_time, MovementComponent& movement) {
     movement.velocity_x += movement.friction_coefficient * delta_time;
     if (movement.velocity_x > 0) movement.velocity_x = 0;
   }
-  DLOG("Is Grounded: " << movement.is_grounded);
-  DLOG("Velocity X: " << movement.velocity_x);
-  DLOG("Acceleration X: " << movement.acceleration_x);
 }
 
 void Game::processPhysicsY(float delta_time, MovementComponent& movement) {
