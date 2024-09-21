@@ -69,20 +69,23 @@ void Game::handleInput() {
 
   input_handler_.getInput();
 
-  // Accelerate in direction pressed.
-  // If nothing pressed then decellerate unless at rest then stop
   const float rate_accleration{player_movement.walk_force /
                                player_movement.mass};
-  if (input_handler_.isRight()) {
+
+  // Accelerate in direction pressed.
+  // If nothing pressed then decellerate unless at rest then stop
+  if (input_handler_.isRight() && player_movement.is_grounded) {
     // Accelerate right
     player_movement.acceleration_x = rate_accleration;
-  } else if (input_handler_.isLeft()) {
+  } else if (input_handler_.isLeft() && player_movement.is_grounded) {
     // Accelerate left
     player_movement.acceleration_x = -rate_accleration;
   } else {
     player_movement.acceleration_x = 0;
     // Artbitrary decelleration rate
-    player_movement.velocity_x *= 0.90;
+    if (player_movement.is_grounded) {
+      player_movement.velocity_x *= 0.90;
+    }
   }
 
   // Jump
@@ -185,22 +188,24 @@ void Game::processPhysics() {
 void Game::processPhysicsX(float delta_time, MovementComponent& movement) {
   // Update velocity based on acceleration where v = v + at
   movement.velocity_x += movement.acceleration_x * delta_time;
+
   // Apply drag: drag reduces the velocity based on current speed
   movement.velocity_x -= movement.velocity_x * movement.drag * delta_time;
-  // If no acceleration, apply friction based on the current surface
-  if (movement.velocity_x > 0) {
+
+  // If moving and grounded, apply friction based on the current surface
+  if (movement.velocity_x > 0 && movement.is_grounded) {
     movement.velocity_x -= movement.friction_coefficient * delta_time;
     if (movement.velocity_x < 0) movement.velocity_x = 0;
-  } else if (movement.velocity_x < 0) {
+  } else if (movement.velocity_x < 0 && movement.is_grounded) {
     movement.velocity_x += movement.friction_coefficient * delta_time;
     if (movement.velocity_x > 0) movement.velocity_x = 0;
   }
+  DLOG("Is Grounded: " << movement.is_grounded);
+  DLOG("Velocity X: " << movement.velocity_x);
+  DLOG("Acceleration X: " << movement.acceleration_x);
 }
 
 void Game::processPhysicsY(float delta_time, MovementComponent& movement) {
-  DLOG("Is grounded: " << movement.is_grounded);
-  DLOG("Velocity Y: " << movement.velocity_y);
-  DLOG("Acceleration Y: " << movement.acceleration_y);
   // Jump velocity
   movement.velocity_y -= movement.acceleration_y * delta_time;
   // Apply gravity to vertical velocity (v = v + g * t)
