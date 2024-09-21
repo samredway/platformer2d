@@ -84,14 +84,23 @@ void Game::handleInput() {
     // Artbitrary decelleration rate
     player_movement.velocity_x *= 0.90;
   }
+
+  // Jump
+  if (input_handler_.isSpace() && player_movement.is_grounded) {
+    // Arbitrary jump force
+    player_movement.acceleration_y = 6000;
+  } else if (player_movement.acceleration_y > 0) {
+    player_movement.acceleration_y = 0;
+  }
 }
 
-// Processors for component collections ///////////////////////////////////////
+// Processors for component collections
+// ///////////////////////////////////////
 void Game::processRendering() const {
   for (const auto& render_pair : render_components_) {
-    const auto& entity_tag{render_pair.first};
-    auto& position{position_components_.at(entity_tag)};
-    const auto& color{render_pair.second.color};
+    const std::string entity_tag{render_pair.first};
+    const PositionComponent& position{position_components_.at(entity_tag)};
+    const Color color{render_pair.second.color};
     DrawRectangle(position.x, position.y, position.width, position.height,
                   color);
   }
@@ -100,29 +109,32 @@ void Game::processRendering() const {
 void Game::processPhysics() {
   float dt{GetFrameTime()};
   for (auto& movement_pair : movement_components_) {
-    auto& movement{movement_pair.second};
+    MovementComponent& movement{movement_pair.second};
     const std::string mover_entity_tag{movement_pair.first};
     PositionComponent& position{position_components_.at(mover_entity_tag)};
 
-    float colliding_downward_y = -100;
-    float colliding_rightward = -100;
-    float colliding_leftward = -100;
+    float colliding_downward_y = -1;
+    float colliding_rightward = -1;
+    float colliding_leftward = -1;
 
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
       // Obv the mover cannot collide with itself
       if (collider_pair.first == mover_entity_tag) continue;
-      const auto& position2{position_components_.at(collider_pair.first)};
+      const PositionComponent& position2{
+          position_components_.at(collider_pair.first)};
 
       // Check for downward collision if player is at rest or moving down
       if (movement.velocity_y >= 0 &&
           position.x <= position2.x + position2.width &&
           position.x + position.width >= position2.x &&
-          position.y + position.height >= position2.y) {
+          position.y + position.height >= position2.y &&
+          position.y < position2.y + position2.height) {
         colliding_downward_y = position2.y;
       }
 
-      auto is_colliding_x = [](auto position, auto position2) {
+      auto is_colliding_x = [](const PositionComponent& position,
+                               const PositionComponent& position2) {
         return position.y >= position2.y &&
                position.y <= position2.y + position2.height &&
                position.x + position.width >= position2.x &&
@@ -156,23 +168,25 @@ void Game::processPhysics() {
       }
     }
 
-    if (colliding_downward_y < 0 || movement.velocity_y < 0) {
-      processPhysicsY(dt, movement);
-      position.y += movement.velocity_y * dt;
-    } else {
+    if (colliding_downward_y >= 0) {
       // Adjust mover y location to sit on top of collision object
       position.y = colliding_downward_y - position.height;
+      movement.velocity_y = 0;
+      movement.is_grounded = true;
+    } else {
+      movement.is_grounded = false;
     }
+
+    processPhysicsY(dt, movement);
+    position.y += movement.velocity_y * dt;
   }
 }
 
 void Game::processPhysicsX(float delta_time, MovementComponent& movement) {
   // Update velocity based on acceleration where v = v + at
   movement.velocity_x += movement.acceleration_x * delta_time;
-
   // Apply drag: drag reduces the velocity based on current speed
   movement.velocity_x -= movement.velocity_x * movement.drag * delta_time;
-
   // If no acceleration, apply friction based on the current surface
   if (movement.velocity_x > 0) {
     movement.velocity_x -= movement.friction_coefficient * delta_time;
@@ -184,10 +198,17 @@ void Game::processPhysicsX(float delta_time, MovementComponent& movement) {
 }
 
 void Game::processPhysicsY(float delta_time, MovementComponent& movement) {
+  DLOG("Is grounded: " << movement.is_grounded);
+  DLOG("Velocity Y: " << movement.velocity_y);
+  DLOG("Acceleration Y: " << movement.acceleration_y);
+  // Jump velocity
+  movement.velocity_y -= movement.acceleration_y * delta_time;
   // Apply gravity to vertical velocity (v = v + g * t)
-  movement.velocity_y += kGravity * delta_time;
-  // Apply air drag to vertical velocity (F_drag = -c * v_y)
-  movement.velocity_y -= movement.velocity_y * movement.drag * delta_time;
+  if (!movement.is_grounded) {
+    movement.velocity_y += kGravity * delta_time;
+    // Apply air drag to vertical velocity (F_drag = -c * v_y)
+    movement.velocity_y -= movement.velocity_y * movement.drag * delta_time;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

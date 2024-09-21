@@ -22,6 +22,7 @@ struct MovementComponent {
   float mass{10.0};
   float friction_coefficient{10};
   float drag{0.2};
+  bool is_grounded{false};
 };
 
 struct RenderComponent {
