@@ -117,14 +117,16 @@ void Game::processPhysics() {
     const std::string mover_entity_tag{movement_pair.first};
     PositionComponent& position{position_components_.at(mover_entity_tag)};
 
-    float colliding_downward_y = -1;
+    float colliding_downward = -1;
     float colliding_rightward = -1;
     float colliding_leftward = -1;
 
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
       // Obv the mover cannot collide with itself
-      if (collider_pair.first == mover_entity_tag) continue;
+      if (collider_pair.first == mover_entity_tag) {
+        continue;
+      }
       const PositionComponent& position2{
           position_components_.at(collider_pair.first)};
 
@@ -133,16 +135,16 @@ void Game::processPhysics() {
           position.x <= position2.x + position2.width &&
           position.x + position.width >= position2.x &&
           position.y + position.height >= position2.y &&
-          position.y < position2.y + position2.height) {
-        colliding_downward_y = position2.y;
+          position.y <= position2.y + position2.height) {
+        colliding_downward = position2.y;
       }
 
       auto is_colliding_x = [](const PositionComponent& position,
                                const PositionComponent& position2) {
-        return position.y >= position2.y &&
-               position.y <= position2.y + position2.height &&
-               position.x + position.width >= position2.x &&
-               position.x <= position2.x + position2.width;
+        return position.y + position.height > position2.y &&
+               position.y < position2.y + position2.height &&
+               position.x + position.width > position2.x &&
+               position.x < position2.x + position2.width;
       };
 
       // Check for right side direction collision
@@ -159,22 +161,22 @@ void Game::processPhysics() {
     if (colliding_rightward < 0 && colliding_leftward < 0) {
       processPhysicsX(dt, movement);
       position.x += movement.velocity_x * dt;
-    } else {
+    } else if (!colliding_downward) {
       // implement collisions
       if (colliding_rightward > 0) {
         position.x = colliding_rightward - position.width - 1;
         movement.velocity_x = 0;
         movement.acceleration_x = 0;
-      } else {
+      } else if (colliding_leftward) {
         position.x = colliding_leftward + 1;
         movement.velocity_x = 0;
         movement.acceleration_x = 0;
       }
     }
 
-    if (colliding_downward_y >= 0) {
+    if (colliding_downward > 0) {
       // Adjust mover y location to sit on top of collision object
-      position.y = colliding_downward_y - position.height;
+      position.y = colliding_downward - position.height;
       movement.velocity_y = 0;
       movement.is_grounded = true;
     } else {
