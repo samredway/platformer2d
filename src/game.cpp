@@ -82,7 +82,8 @@ void Game::handleInput() {
     player_movement.acceleration_x = -rate_accleration;
   } else {
     player_movement.acceleration_x = 0;
-    // Artbitrary decelleration rate
+    // Artbitrary decelleration rate to mimic players own force in
+    // slowing down
     if (player_movement.is_grounded) {
       player_movement.velocity_x *= 0.90;
     }
