@@ -69,7 +69,6 @@ void PhysicsSystem::update() {
           // Stop all movement in y direction and mark as grounded
           position.y = position2.y - position.height;
           movement_component.velocity_y = 0;
-          movement_component.acceleration_y = 0;
           movement_component.is_grounded = true;
         } else if (min_diff == bottom_diff) {
           // Collided with the bottom
