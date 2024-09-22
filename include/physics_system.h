@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <unordered_map>
 
 #include "components.h"
@@ -16,12 +17,6 @@ class PhysicsSystem {
   void update();
 
  private:
-  void handleCollisionX(MovementComponent& movement_compont,
-                        PositionComponent& mover_position,
-                        const PositionComponent& collide);
-  void handleCollisionY(MovementComponent& movement_compont,
-                        PositionComponent& mover_position,
-                        const PositionComponent& collide);
   void updateVelocityX(MovementComponent& movement_component, float delta_time);
   void updateVelocityY(MovementComponent& movement_component, float delta_time);
 

@@ -97,7 +97,7 @@ void Game::handleInput() {
   // Jump
   if (input_handler_.isSpace() && player_movement.is_grounded) {
     // Arbitrary jump force
-    player_movement.acceleration_y = 6000;
+    player_movement.acceleration_y = 600;
   } else if (player_movement.acceleration_y > 0) {
     player_movement.acceleration_y = 0;
   }

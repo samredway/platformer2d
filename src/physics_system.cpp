@@ -34,6 +34,9 @@ void PhysicsSystem::update() {
     // Obv the mover cannot collide with itself
     have_checked.push_back(mover_entity_tag);
 
+    // Reset is grounded before we check for collisions
+    movement_component.is_grounded = false;
+
     // Check collisions.
     for (auto& collider_pair : collision_components_) {
       if (std::find(have_checked.begin(), have_checked.end(),
@@ -45,25 +48,47 @@ void PhysicsSystem::update() {
       const PositionComponent& position2{
           position_components_.at(collider_pair.first)};
 
-      // Check for y collisions
-      if (position.x <= position2.x + position2.width &&
-          position.x + position.width >= position2.x &&
-          position.y + position.height >= position2.y &&
-          position.y <= position2.y + position2.height) {
-        DLOG("Collision Y!");
-        handleCollisionY(movement_component, position, position2);
-        break;
-      } else {
-        movement_component.is_grounded = false;
-      }
+      const bool is_colliding = position.x <= position2.x + position2.width &&
+                                position.x + position.width >= position2.x &&
+                                position.y + position.height >= position2.y &&
+                                position.y <= position2.y + position2.height;
 
-      // Check for x direction collisions
-      if (position.y + position.height > position2.y &&
-          position.y < position2.y + position2.height &&
-          position.x + position.width > position2.x &&
-          position.x < position2.x + position2.width) {
-        handleCollisionX(movement_component, position, position2);
-        break;
+      if (is_colliding) {
+        // Get distance from each side. The closest is the side colliding
+        float bottom_diff =
+            std::abs(position2.y + position2.height) - position.y;
+        float top_diff = std::abs(position.y + position.height) - position2.y;
+        float left_diff = std::abs(position.x + position.width) - position2.x;
+        float right_diff = std::abs(position2.x + position2.width) - position.x;
+
+        // Find the minimum difference to determine the side of the collision
+        float min_diff =
+            std::min({bottom_diff, top_diff, left_diff, right_diff});
+
+        if (min_diff == top_diff) {
+          // Collided with the top
+          // Reset position to 'snap back' in case of overlap
+          // Stop all movement in y direction and mark as grounded
+          position.y = position2.y - position.height;
+          movement_component.velocity_y = 0;
+          movement_component.acceleration_y = 0;
+          movement_component.is_grounded = true;
+        } else if (min_diff == bottom_diff) {
+          // Collided with the bottom
+          // TODO
+        } else if (min_diff == left_diff) {
+          // Collided with the left
+          // Snap back and set x movement to 0
+          position.x = position2.x - position.width - 1;
+          movement_component.velocity_x = 0;
+          movement_component.acceleration_x = 0;
+        } else if (min_diff == right_diff) {
+          // Collided with the right
+          // Snap back and set x movement to 0
+          position.x = position2.x + position.width + 1;
+          movement_component.velocity_x = 0;
+          movement_component.acceleration_x = 0;
+        }
       }
     }
 
@@ -78,32 +103,6 @@ void PhysicsSystem::update() {
     position.x += movement_component.velocity_x;
     DLOG("  Position Y: " << position.y);
   }
-}
-
-void PhysicsSystem::handleCollisionY(MovementComponent& movement_component,
-                                     PositionComponent& mover_position,
-                                     const PositionComponent& collide) {
-  // Reset the movers Y so as to prevent any overlap and have it rest properly
-  // on top of the collider in the case where mover is falling downward
-  if (movement_component.velocity_y >= 0) {
-    mover_position.y = collide.y - mover_position.height;
-    movement_component.velocity_y = 0;
-    movement_component.acceleration_y = 0;
-    movement_component.is_grounded = true;
-  }
-}
-
-void PhysicsSystem::handleCollisionX(MovementComponent& movement_component,
-                                     PositionComponent& mover_position,
-                                     const PositionComponent& collide) {
-  if (movement_component.velocity_x > 0) {
-    // -1 to move it out of collision so that it doesn't get stuck
-    mover_position.x = collide.x - mover_position.width - 1;
-  } else {
-    mover_position.x = collide.x + collide.width + 1;
-  }
-  movement_component.acceleration_x = 0;
-  movement_component.velocity_x = 0;
 }
 
 void PhysicsSystem::updateVelocityY(MovementComponent& movement,
