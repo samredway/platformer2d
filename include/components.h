@@ -18,10 +18,10 @@ struct MovementComponent {
   float velocity_y{0};
   float acceleration_x{0};
   float acceleration_y{0};
-  float walk_force{6000};
+  float walk_force{300};
   float mass{10.0};
   float friction_coefficient{10};
-  float drag{1};
+  float drag{0.05};
   bool is_grounded{false};
 };
 

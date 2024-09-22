@@ -13,18 +13,17 @@ class PhysicsSystem {
       std::unordered_map<std::string, PositionComponent>& position_components,
       std::unordered_map<std::string, CollisionComponent>&
           collision_components);
-  void detectCollisions();
+  void update();
 
  private:
-  void detectCollisions_right();
   void handleCollisionX(MovementComponent& movement_compont,
                         PositionComponent& mover_position,
                         const PositionComponent& collide);
   void handleCollisionY(MovementComponent& movement_compont,
                         PositionComponent& mover_position,
                         const PositionComponent& collide);
-  void updatePositionY();
-  void updatePositionX();
+  void updateVelocityX(MovementComponent& movement_component, float delta_time);
+  void updateVelocityY(MovementComponent& movement_component, float delta_time);
 
   std::unordered_map<std::string, MovementComponent>& movement_components_;
   std::unordered_map<std::string, PositionComponent>& position_components_;

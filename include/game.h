@@ -5,6 +5,7 @@
 
 #include "components.h"
 #include "input_handler.h"
+#include "physics_system.h"
 
 namespace platformer2d {
 
@@ -18,13 +19,11 @@ class Game {
  private:
   void handleInput();
   void processRendering() const;
-  void processPhysics();
-  void processPhysicsX(float delta_time, MovementComponent& movement);
-  void processPhysicsY(float delta_time, MovementComponent& movement);
 
   const int screen_width_;
   const int screen_height_;
   InputHandler input_handler_;
+  PhysicsSystem physics_;
 
   // Systems are just collections of components right now with their
   // own processor method (these probably get moved out to scenes or
