@@ -3,7 +3,6 @@
 
 #include "components.h"
 #include "constants.h"
-#include "macros.h"
 #include "physics_system.h"
 #include "raylib.h"
 
@@ -20,7 +19,6 @@ PhysicsSystem::PhysicsSystem(
 
 void PhysicsSystem::update() {
   for (auto& movement_pair : movement_components_) {
-    DLOG("Updating physics:");
     const std::string mover_entity_tag{movement_pair.first};
 
     // Movers components
@@ -94,14 +92,10 @@ void PhysicsSystem::update() {
 
     // Update position
     float dt = GetFrameTime();
-    DLOG("  Delta time: " << dt);
     updateVelocityY(movement_component, dt);
-    DLOG("  Velocity Y: " << movement_component.velocity_y);
-    DLOG("  Acceleration Y: " << movement_component.acceleration_y);
     position.y += movement_component.velocity_y;
     updateVelocityX(movement_component, dt);
     position.x += movement_component.velocity_x;
-    DLOG("  Position Y: " << position.y);
   }
 }
 
