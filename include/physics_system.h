@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <unordered_map>
 
 #include "components.h"
@@ -17,9 +16,6 @@ class PhysicsSystem {
   void update();
 
  private:
-  void updateVelocityX(MovementComponent& movement_component, float delta_time);
-  void updateVelocityY(MovementComponent& movement_component, float delta_time);
-
   std::unordered_map<std::string, MovementComponent>& movement_components_;
   std::unordered_map<std::string, PositionComponent>& position_components_;
   std::unordered_map<std::string, CollisionComponent>& collision_components_;
