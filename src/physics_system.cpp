@@ -21,6 +21,7 @@ void handleCollision(MovementComponent& movement_component,
 void updateVelocityY(MovementComponent& movement, float delta_time);
 void updateVelocityX(MovementComponent& movement, float delta_time);
 
+// Public methods
 PhysicsSystem::PhysicsSystem(
     std::unordered_map<std::string, MovementComponent>& movement_components,
     std::unordered_map<std::string, PositionComponent>& position_components,
