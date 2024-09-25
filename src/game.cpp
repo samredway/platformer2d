@@ -9,6 +9,7 @@ Game::Game(int width, int height)
   // Setup Window
   InitWindow(screen_width_, screen_height_, "2D Platform Game");
   SetTargetFPS(kTargetFPS);
+  level_.init();
 }
 
 Game::~Game() {

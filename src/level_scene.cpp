@@ -2,6 +2,8 @@
 #include <string>
 
 #include "level_scene.h"
+#include "macros.h"
+#include "raylib.h"
 
 namespace platformer2d {
 
@@ -10,33 +12,42 @@ const std::string playerTag{"player"};
 LevelScene::LevelScene(const float width, const float height)
     : width_(width),
       height_(height),
+      assets_(),
       input_handler_(),
       physics_(movement_components_, position_components_,
                collision_components_) {
+}
+
+void LevelScene::init() {
+  // Load textures
+  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png");
+  assets_.loadTexture("pink_monster_idle", "assets/Pink_Monster_Idle_4.png");
+  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png");
+
   // Initialise player components
   position_components_.emplace(
       playerTag,
-      PositionComponent{(float)width / 2, (float)height / 2, 40, 40});
+      PositionComponent{(float)width_ / 2, (float)height_ / 2, 40, 40});
   movement_components_.emplace(playerTag, MovementComponent{});
-  render_components_.emplace(playerTag, RenderComponent{RED});
+  render_components_.emplace(playerTag, RenderComponent{"pink_monster_idle"});
   collision_components_.emplace(playerTag, CollisionComponent{});
 
   // Floor tiles
   for (int i = 0; i < 8; i++) {
     const std::string tileTag{std::format("tile{}", i)};
-    const float x{(width / 2.0f) - ((4.0f - i) * 40)};
+    const float x{(width_ / 2.0f) - ((4.0f - i) * 40)};
     position_components_.emplace(
-        tileTag, PositionComponent{x, (float)height - 40, 40, 40});
-    render_components_.emplace(tileTag, RenderComponent{BLACK});
+        tileTag, PositionComponent{x, (float)height_ - 40, 40, 40});
+    render_components_.emplace(tileTag, RenderComponent{"winter_ground_1"});
     collision_components_.emplace(tileTag, CollisionComponent{});
   }
 
   // Central tile to do x collision on
   const std::string tileTag{std::format("tile8")};
-  const float x{(width / 2.0f) - 20};
+  const float x{(width_ / 2.0f) - 20};
   position_components_.emplace(
-      tileTag, PositionComponent{x, (float)height - 80, 40, 40});
-  render_components_.emplace(tileTag, RenderComponent{BLACK});
+      tileTag, PositionComponent{x, (float)height_ - 80, 40, 40});
+  render_components_.emplace(tileTag, RenderComponent{"ice_block"});
   collision_components_.emplace(tileTag, CollisionComponent{});
 }
 
@@ -49,9 +60,16 @@ void LevelScene::draw() const {
   for (const auto& render_pair : render_components_) {
     const std::string entity_tag{render_pair.first};
     const PositionComponent& position{position_components_.at(entity_tag)};
-    const Color color{render_pair.second.color};
-    DrawRectangle(position.x, position.y, position.width, position.height,
-                  color);
+    const Texture2D& texture{
+        assets_.getTexture(render_pair.second.texture_name)};
+    const float kRotation = 0.0;
+    // to get scale its 1/(actual_value/required_value) I am enforcing aligment
+    // by height so as blocks match for walking surface. Maybe I should just do
+    // this in an art program and allow scale as a compnent field so it can be
+    // tweaked at will though
+    const float scale = 1 / (texture.height / (float)position.height);
+    DrawTextureEx(texture, Vector2(position.x, position.y), kRotation, scale,
+                  WHITE);
   }
 }
 

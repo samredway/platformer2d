@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "asset_manager.h"
 #include "components.h"
 #include "input_handler.h"
 #include "physics_system.h"
@@ -15,6 +16,7 @@ class LevelScene : Scene {
   LevelScene(const float width, const float height);
   void draw() const override;
   void update() override;
+  void init();
 
  private:
   void handleInput();
@@ -24,6 +26,7 @@ class LevelScene : Scene {
   const float height_;
 
   // Owned systems
+  AssetManager assets_;
   InputHandler input_handler_;
   PhysicsSystem physics_;
 

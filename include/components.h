@@ -1,6 +1,6 @@
 #pragma once
 
-#include "raylib.h"
+#include <string>
 
 namespace platformer2d {
 
@@ -26,7 +26,7 @@ struct MovementComponent {
 };
 
 struct RenderComponent {
-  Color color;
+  std::string texture_name;
 };
 
 }  // namespace platformer2d
