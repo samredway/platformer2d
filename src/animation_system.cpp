@@ -1,7 +1,5 @@
 #include "animation_system.h"
-
 #include "constants.h"
-#include "macros.h"
 #include "raylib.h"
 
 namespace platformer2d {
