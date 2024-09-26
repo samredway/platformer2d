@@ -113,9 +113,9 @@ void LevelScene::draw() const {
     Vector2 origin = {0.0f, 0.0f};
 
     // TODO Flip the sprite if moving left
-    // if (direction_ == Direction::kLeft) {
-    //   frameRec.width = -sprite_width;  // Flip the sprite horizontally
-    // }
+    if (!position.is_facing_right) {
+      frameRec.width = -sprite_width;  // Flip the sprite horizontally
+    }
 
     // Draw the texture using DrawTexturePro, which supports scaling
     DrawTexturePro(animation_frames, frameRec, destRec, origin, 0.0f, WHITE);
@@ -125,7 +125,9 @@ void LevelScene::draw() const {
 void LevelScene::handleInput() {
   // Would crash if player not defined somehow
   auto& player_movement{movement_components_.at(playerTag)};
+  auto& position{position_components_.at(playerTag)};
 
+  // Get the keyboard input
   input_handler_.getInput();
 
   const float rate_accleration{player_movement.walk_force /
@@ -136,9 +138,11 @@ void LevelScene::handleInput() {
   if (input_handler_.isRight() && player_movement.is_grounded) {
     // Accelerate right
     player_movement.acceleration_x = rate_accleration;
+    position.is_facing_right = true;
   } else if (input_handler_.isLeft() && player_movement.is_grounded) {
     // Accelerate left
     player_movement.acceleration_x = -rate_accleration;
+    position.is_facing_right = false;
   } else {
     player_movement.acceleration_x = 0;
     // Artbitrary decelleration rate to mimic players own force in
@@ -150,8 +154,7 @@ void LevelScene::handleInput() {
 
   // Jump
   if (input_handler_.isSpace() && player_movement.is_grounded) {
-    // Arbitrary jump force
-    player_movement.acceleration_y = 200;
+    player_movement.acceleration_y = player_movement.jump_force;
   } else if (player_movement.acceleration_y > 0) {
     player_movement.acceleration_y = 0;
   }

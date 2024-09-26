@@ -13,6 +13,7 @@ struct PositionComponent {
   float y;
   int width;
   int height;
+  bool is_facing_right{true};
 };
 
 struct MovementComponent {
@@ -20,7 +21,8 @@ struct MovementComponent {
   float velocity_y{0};
   float acceleration_x{0};
   float acceleration_y{0};
-  float walk_force{300};
+  float jump_force{225};
+  float walk_force{325};
   float mass{10.0};
   float friction_coefficient{10};
   float drag{0.05};
