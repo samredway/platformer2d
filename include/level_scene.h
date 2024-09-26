@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "animation_system.h"
 #include "asset_manager.h"
 #include "components.h"
 #include "input_handler.h"
@@ -29,7 +30,7 @@ class LevelScene : Scene {
   AssetManager assets_;
   InputHandler input_handler_;
   PhysicsSystem physics_;
-
+  AnimationSystem animation_system_;
   // Owned component maps
   std::unordered_map<std::string, PositionComponent> position_components_;
   std::unordered_map<std::string, CollisionComponent> collision_components_;

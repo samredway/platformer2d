@@ -1,3 +1,5 @@
+#include "level_scene.h"
+
 #include <cstdint>
 #include <format>
 #include <string>
@@ -5,7 +7,6 @@
 
 #include "components.h"
 #include "constants.h"
-#include "level_scene.h"
 #include "raylib.h"
 
 namespace platformer2d {
@@ -18,7 +19,8 @@ LevelScene::LevelScene(const float width, const float height)
       assets_(),
       input_handler_(),
       physics_(movement_components_, position_components_,
-               collision_components_) {
+               collision_components_),
+      animation_system_(animation_components_, position_components_, assets_) {
 }
 
 void LevelScene::init() {
@@ -81,45 +83,7 @@ void LevelScene::draw() const {
   }
 
   // Draw animations (Sprites)
-  for (const auto& pair : animation_components_) {
-    auto& position{position_components_.at(pair.first)};
-    auto& animation{pair.second};
-    std::string texture_name{
-        animation.state_to_texture_name_map.at(animation.current_state)};
-    Texture2D animation_frames{assets_.getTexture(texture_name)};
-    int8_t num_frames{
-        animation.state_to_num_frames_map.at(animation.current_state)};
-
-    // Update the animation frame roughly at a rate of kAnimationFPS
-    constexpr float kAnimationFPS = 1.0f;
-    const int current_frame = 5 / (kTargetFPS / kAnimationFPS);
-
-    const float sprite_width = (float)animation_frames.width / num_frames;
-    const float sprite_pos_x = current_frame * sprite_width;
-
-    Rectangle frameRec = {sprite_pos_x, 0, sprite_width,
-                          (float)animation_frames.height};
-
-    // Destination rectangle (this controls the position and scaling)
-    float scale = 1.3f;
-    Rectangle destRec = {
-        position.x,                             // Destination X position
-        position.y,                             // Destination Y position
-        sprite_width * scale,                   // Destination width (scaled)
-        (float)animation_frames.height * scale  // Destination height (scaled)
-    };
-
-    // Origin for rotation/scaling (set to the center of the texture)
-    Vector2 origin = {0.0f, 0.0f};
-
-    // TODO Flip the sprite if moving left
-    if (!position.is_facing_right) {
-      frameRec.width = -sprite_width;  // Flip the sprite horizontally
-    }
-
-    // Draw the texture using DrawTexturePro, which supports scaling
-    DrawTexturePro(animation_frames, frameRec, destRec, origin, 0.0f, WHITE);
-  }
+  animation_system_.draw();
 }
 
 void LevelScene::handleInput() {
