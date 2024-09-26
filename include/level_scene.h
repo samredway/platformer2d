@@ -35,6 +35,7 @@ class LevelScene : Scene {
   std::unordered_map<std::string, CollisionComponent> collision_components_;
   std::unordered_map<std::string, MovementComponent> movement_components_;
   std::unordered_map<std::string, RenderComponent> render_components_;
+  std::unordered_map<std::string, AnimationComponent> animation_components_;
 };
 
 }  // namespace platformer2d

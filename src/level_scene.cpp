@@ -1,8 +1,11 @@
+#include <cstdint>
 #include <format>
 #include <string>
+#include <utility>
 
+#include "components.h"
+#include "constants.h"
 #include "level_scene.h"
-#include "macros.h"
 #include "raylib.h"
 
 namespace platformer2d {
@@ -29,8 +32,12 @@ void LevelScene::init() {
       playerTag,
       PositionComponent{(float)width_ / 2, (float)height_ / 2, 40, 40});
   movement_components_.emplace(playerTag, MovementComponent{});
-  render_components_.emplace(playerTag, RenderComponent{"pink_monster_idle"});
   collision_components_.emplace(playerTag, CollisionComponent{});
+  AnimationComponent player_animation{};
+  player_animation.current_state = "idle";
+  player_animation.state_to_num_frames_map["idle"] = 4;
+  player_animation.state_to_texture_name_map["idle"] = "pink_monster_idle";
+  animation_components_.emplace(playerTag, player_animation);
 
   // Floor tiles
   for (int i = 0; i < 8; i++) {
@@ -57,12 +64,13 @@ void LevelScene::update() {
 }
 
 void LevelScene::draw() const {
+  // Draw static components (Tiles)
   for (const auto& render_pair : render_components_) {
     const std::string entity_tag{render_pair.first};
     const PositionComponent& position{position_components_.at(entity_tag)};
     const Texture2D& texture{
         assets_.getTexture(render_pair.second.texture_name)};
-    const float kRotation = 0.0;
+    constexpr float kRotation = 0.0;
     // to get scale its 1/(actual_value/required_value) I am enforcing aligment
     // by height so as blocks match for walking surface. Maybe I should just do
     // this in an art program and allow scale as a compnent field so it can be
@@ -70,6 +78,47 @@ void LevelScene::draw() const {
     const float scale = 1 / (texture.height / (float)position.height);
     DrawTextureEx(texture, Vector2(position.x, position.y), kRotation, scale,
                   WHITE);
+  }
+
+  // Draw animations (Sprites)
+  for (const auto& pair : animation_components_) {
+    auto& position{position_components_.at(pair.first)};
+    auto& animation{pair.second};
+    std::string texture_name{
+        animation.state_to_texture_name_map.at(animation.current_state)};
+    Texture2D animation_frames{assets_.getTexture(texture_name)};
+    int8_t num_frames{
+        animation.state_to_num_frames_map.at(animation.current_state)};
+
+    // Update the animation frame roughly at a rate of kAnimationFPS
+    constexpr float kAnimationFPS = 1.0f;
+    const int current_frame = 5 / (kTargetFPS / kAnimationFPS);
+
+    const float sprite_width = (float)animation_frames.width / num_frames;
+    const float sprite_pos_x = current_frame * sprite_width;
+
+    Rectangle frameRec = {sprite_pos_x, 0, sprite_width,
+                          (float)animation_frames.height};
+
+    // Destination rectangle (this controls the position and scaling)
+    float scale = 1.3f;
+    Rectangle destRec = {
+        position.x,                             // Destination X position
+        position.y,                             // Destination Y position
+        sprite_width * scale,                   // Destination width (scaled)
+        (float)animation_frames.height * scale  // Destination height (scaled)
+    };
+
+    // Origin for rotation/scaling (set to the center of the texture)
+    Vector2 origin = {0.0f, 0.0f};
+
+    // TODO Flip the sprite if moving left
+    // if (direction_ == Direction::kLeft) {
+    //   frameRec.width = -sprite_width;  // Flip the sprite horizontally
+    // }
+
+    // Draw the texture using DrawTexturePro, which supports scaling
+    DrawTexturePro(animation_frames, frameRec, destRec, origin, 0.0f, WHITE);
   }
 }
 
