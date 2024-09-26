@@ -18,6 +18,11 @@ AnimationSystem::AnimationSystem(
 
 void AnimationSystem::update() {
   frame_number_++;
+
+  // Reset the frame number if it's too large
+  if (frame_number_ > kTargetFPS * 10) {
+    frame_number_ = 0;
+  } 
 }
 
 void AnimationSystem::draw() const {
@@ -33,8 +38,7 @@ void AnimationSystem::draw() const {
     // Update the animation frame at a rate of roughly animation_fps
     int current_frame{static_cast<int>(frame_number_ /
                                        (kTargetFPS * animation.animation_fps))};
-    DLOG("Frame number: " << frame_number_);
-    DLOG("Current frame: " << current_frame);
+    current_frame %= num_frames;
 
     const float sprite_width = (float)animation_frames.width / num_frames;
     const float sprite_pos_x = current_frame * sprite_width;
