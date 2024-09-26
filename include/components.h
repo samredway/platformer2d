@@ -37,6 +37,7 @@ struct AnimationComponent {
   std::unordered_map<std::string, std::string> state_to_texture_name_map;
   std::unordered_map<std::string, int8_t> state_to_num_frames_map;
   std::string current_state = "idle";  // eg idle, walking, running
+  float animation_fps{1.0f};
 };
 
 }  // namespace platformer2d

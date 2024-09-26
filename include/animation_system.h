@@ -20,6 +20,7 @@ class AnimationSystem {
   std::unordered_map<std::string, AnimationComponent>& animations_;
   std::unordered_map<std::string, PositionComponent>& positions_;
   AssetManager& assets_;
+  int frame_number_;
 };
 
 }  // namespace platformer2d

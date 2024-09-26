@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/animation_system.o",
+      "src/animation_system.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/animation_system.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/animation_system.o"
+  }
+]

@@ -62,6 +62,7 @@ void LevelScene::init() {
 
 void LevelScene::update() {
   handleInput();
+  animation_system_.update();
   physics_.update();
 }
 

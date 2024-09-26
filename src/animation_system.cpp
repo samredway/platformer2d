@@ -1,6 +1,7 @@
 #include "animation_system.h"
 
 #include "constants.h"
+#include "macros.h"
 #include "raylib.h"
 
 namespace platformer2d {
@@ -9,10 +10,14 @@ AnimationSystem::AnimationSystem(
     std::unordered_map<std::string, AnimationComponent>& animations,
     std::unordered_map<std::string, PositionComponent>& positions,
     AssetManager& assets)
-    : animations_(animations), positions_(positions), assets_(assets) {
+    : animations_(animations),
+      positions_(positions),
+      assets_(assets),
+      frame_number_(0) {
 }
 
 void AnimationSystem::update() {
+  frame_number_++;
 }
 
 void AnimationSystem::draw() const {
@@ -25,9 +30,11 @@ void AnimationSystem::draw() const {
     int8_t num_frames{
         animation.state_to_num_frames_map.at(animation.current_state)};
 
-    // Update the animation frame roughly at a rate of kAnimationFPS
-    constexpr float kAnimationFPS = 1.0f;
-    const int current_frame = 5 / (kTargetFPS / kAnimationFPS);
+    // Update the animation frame at a rate of roughly animation_fps
+    int current_frame{static_cast<int>(frame_number_ /
+                                       (kTargetFPS * animation.animation_fps))};
+    DLOG("Frame number: " << frame_number_);
+    DLOG("Current frame: " << current_frame);
 
     const float sprite_width = (float)animation_frames.width / num_frames;
     const float sprite_pos_x = current_frame * sprite_width;
