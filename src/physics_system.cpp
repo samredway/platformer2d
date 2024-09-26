@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "components.h"
-#include "constants.h"
 #include "physics_system.h"
+#include "constants.h"
 #include "raylib.h"
 
 namespace platformer2d {
