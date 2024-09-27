@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "animation_system.h"
+#include "animation_state_system.h"
 #include "asset_manager.h"
 #include "components.h"
 #include "input_handler.h"
@@ -37,6 +38,7 @@ class LevelScene : Scene {
   std::unordered_map<std::string, MovementComponent> movement_components_;
   std::unordered_map<std::string, RenderComponent> render_components_;
   std::unordered_map<std::string, AnimationComponent> animation_components_;
+  AnimationStateSystem animation_state_system_;
 };
 
 }  // namespace platformer2d

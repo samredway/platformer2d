@@ -12,11 +12,11 @@
       "-O0",
       "-c",
       "-o",
-      "build/animation_system.o",
-      "src/animation_system.cpp"
+      "build/level_scene.o",
+      "src/level_scene.cpp"
     ],
     "directory": "/Users/samredway/development/cpp/games/platformer2d",
-    "file": "/Users/samredway/development/cpp/games/platformer2d/src/animation_system.cpp",
-    "output": "/Users/samredway/development/cpp/games/platformer2d/build/animation_system.o"
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/level_scene.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/level_scene.o"
   }
 ]

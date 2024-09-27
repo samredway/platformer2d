@@ -35,7 +35,7 @@ void AnimationSystem::draw() const {
 
     // Update the animation frame at a rate of roughly animation_fps
     int current_frame{static_cast<int>(frame_number_ /
-                                       (kTargetFPS * animation.animation_fps))};
+                                       (kTargetFPS * animation.animation_fps.at(animation.current_state)))};
     current_frame %= num_frames;
 
     const float sprite_width = (float)animation_frames.width / num_frames;

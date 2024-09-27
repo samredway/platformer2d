@@ -1,12 +1,10 @@
 #include "level_scene.h"
 
-#include <cstdint>
 #include <format>
 #include <string>
 #include <utility>
 
 #include "components.h"
-#include "constants.h"
 #include "raylib.h"
 
 namespace platformer2d {
@@ -20,13 +18,15 @@ LevelScene::LevelScene(const float width, const float height)
       input_handler_(),
       physics_(movement_components_, position_components_,
                collision_components_),
-      animation_system_(animation_components_, position_components_, assets_) {
+      animation_system_(animation_components_, position_components_, assets_),
+      animation_state_system_(animation_components_, movement_components_) {
 }
 
 void LevelScene::init() {
   // Load textures
   assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png");
   assets_.loadTexture("pink_monster_idle", "assets/Pink_Monster_Idle_4.png");
+  assets_.loadTexture("pink_monster_run", "assets/Pink_Monster_Run_6.png");
   assets_.loadTexture("ice_block", "assets/winter_ground/ice.png");
 
   // Initialise player components
@@ -36,9 +36,15 @@ void LevelScene::init() {
   movement_components_.emplace(playerTag, MovementComponent{});
   collision_components_.emplace(playerTag, CollisionComponent{});
   AnimationComponent player_animation{};
-  player_animation.current_state = "idle";
-  player_animation.state_to_num_frames_map["idle"] = 4;
-  player_animation.state_to_texture_name_map["idle"] = "pink_monster_idle";
+  player_animation.current_state = AnimationState::kIdle;
+  player_animation.state_to_num_frames_map[AnimationState::kIdle] = 4;
+  player_animation.state_to_texture_name_map[AnimationState::kIdle] =
+      "pink_monster_idle";
+  player_animation.state_to_texture_name_map[AnimationState::kRunning] =
+      "pink_monster_run";
+  player_animation.state_to_num_frames_map[AnimationState::kRunning] = 6;
+  player_animation.animation_fps[AnimationState::kIdle] = 0.4f;
+  player_animation.animation_fps[AnimationState::kRunning] = 0.1f;
   animation_components_.emplace(playerTag, player_animation);
 
   // Floor tiles
@@ -62,6 +68,7 @@ void LevelScene::init() {
 
 void LevelScene::update() {
   handleInput();
+  animation_state_system_.update();
   animation_system_.update();
   physics_.update();
 }

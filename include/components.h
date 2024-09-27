@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "animation_state.h"
+
 namespace platformer2d {
 
 struct CollisionComponent {};
@@ -33,11 +35,14 @@ struct RenderComponent {
   std::string texture_name;
 };
 
+class AnimationRules;
+
 struct AnimationComponent {
-  std::unordered_map<std::string, std::string> state_to_texture_name_map;
-  std::unordered_map<std::string, int8_t> state_to_num_frames_map;
-  std::string current_state = "idle";  // eg idle, walking, running
-  float animation_fps{0.6f};
+  std::unordered_map<AnimationState, std::string> state_to_texture_name_map;
+  std::unordered_map<AnimationState, int8_t> state_to_num_frames_map;
+  AnimationState current_state = AnimationState::kIdle;
+  std::unordered_map<AnimationState, float> animation_fps;
+  int8_t current_frame{0};
 };
 
 }  // namespace platformer2d

@@ -1,5 +1,5 @@
-#include "constants.h"
 #include "game.h"
+#include "constants.h"
 #include "raylib.h"
 
 namespace platformer2d {
