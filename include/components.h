@@ -35,8 +35,6 @@ struct RenderComponent {
   std::string texture_name;
 };
 
-class AnimationRules;
-
 struct AnimationComponent {
   std::unordered_map<AnimationState, std::string> state_to_texture_name_map;
   std::unordered_map<AnimationState, int8_t> state_to_num_frames_map;
