@@ -19,8 +19,8 @@ LevelScene::LevelScene(const float width, const float height)
       physics_(movement_components_, position_components_,
                collision_components_),
       animation_system_(animation_components_, position_components_, assets_),
-      animation_state_system_(animation_components_, movement_components_) {
-}
+      animation_state_system_(animation_components_, movement_components_),
+      render_system_(position_components_, render_components_, assets_) {}
 
 void LevelScene::init() {
   // Load textures
@@ -30,22 +30,7 @@ void LevelScene::init() {
   assets_.loadTexture("ice_block", "assets/winter_ground/ice.png");
 
   // Initialise player components
-  position_components_.emplace(
-      playerTag,
-      PositionComponent{(float)width_ / 2, (float)height_ / 2, 40, 40});
-  movement_components_.emplace(playerTag, MovementComponent{});
-  collision_components_.emplace(playerTag, CollisionComponent{});
-  AnimationComponent player_animation{};
-  player_animation.current_state = AnimationState::kIdle;
-  player_animation.state_to_num_frames_map[AnimationState::kIdle] = 4;
-  player_animation.state_to_texture_name_map[AnimationState::kIdle] =
-      "pink_monster_idle";
-  player_animation.state_to_texture_name_map[AnimationState::kRunning] =
-      "pink_monster_run";
-  player_animation.state_to_num_frames_map[AnimationState::kRunning] = 6;
-  player_animation.animation_fps[AnimationState::kIdle] = 0.4f;
-  player_animation.animation_fps[AnimationState::kRunning] = 0.1f;
-  animation_components_.emplace(playerTag, player_animation);
+  initPlayer();
 
   // Floor tiles
   for (int i = 0; i < 8; i++) {
@@ -66,6 +51,25 @@ void LevelScene::init() {
   collision_components_.emplace(tileTag, CollisionComponent{});
 }
 
+void LevelScene::initPlayer() {
+  position_components_.emplace(
+      playerTag,
+      PositionComponent{(float)width_ / 2, (float)height_ / 2, 40, 40});
+  movement_components_.emplace(playerTag, MovementComponent{});
+  collision_components_.emplace(playerTag, CollisionComponent{});
+  AnimationComponent player_animation{};
+  player_animation.current_state = AnimationState::kIdle;
+  player_animation.state_to_num_frames_map[AnimationState::kIdle] = 4;
+  player_animation.state_to_texture_name_map[AnimationState::kIdle] =
+      "pink_monster_idle";
+  player_animation.state_to_texture_name_map[AnimationState::kRunning] =
+      "pink_monster_run";
+  player_animation.state_to_num_frames_map[AnimationState::kRunning] = 6;
+  player_animation.animation_fps[AnimationState::kIdle] = 0.4f;
+  player_animation.animation_fps[AnimationState::kRunning] = 0.1f;
+  animation_components_.emplace(playerTag, player_animation);
+}
+
 void LevelScene::update() {
   handleInput();
   animation_state_system_.update();
@@ -75,20 +79,7 @@ void LevelScene::update() {
 
 void LevelScene::draw() const {
   // Draw static components (Tiles)
-  for (const auto& render_pair : render_components_) {
-    const std::string entity_tag{render_pair.first};
-    const PositionComponent& position{position_components_.at(entity_tag)};
-    const Texture2D& texture{
-        assets_.getTexture(render_pair.second.texture_name)};
-    constexpr float kRotation = 0.0;
-    // to get scale its 1/(actual_value/required_value) I am enforcing aligment
-    // by height so as blocks match for walking surface. Maybe I should just do
-    // this in an art program and allow scale as a compnent field so it can be
-    // tweaked at will though
-    const float scale = 1 / (texture.height / (float)position.height);
-    DrawTextureEx(texture, Vector2(position.x, position.y), kRotation, scale,
-                  WHITE);
-  }
+  render_system_.draw();
 
   // Draw animations (Sprites)
   animation_system_.draw();
