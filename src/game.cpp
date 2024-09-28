@@ -1,4 +1,5 @@
 #include "game.h"
+
 #include "constants.h"
 #include "raylib.h"
 
@@ -12,13 +13,9 @@ Game::Game(int width, int height)
   level_.init();
 }
 
-Game::~Game() {
-  CloseWindow();
-}
+Game::~Game() { CloseWindow(); }
 
-void Game::update() {
-  level_.update();
-}
+void Game::update() { level_.update(); }
 
 void Game::draw() const {
   BeginDrawing();

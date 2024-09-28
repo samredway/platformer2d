@@ -20,7 +20,7 @@ This project uses Makefile for build instructions and bear to build the compile_
 
 To build the compile_commmands.json just run
 
-    bear --output ./build/compile_commands.json -- make
+    bear -- make
 
 This will build the project and update the compile_commands.json
 

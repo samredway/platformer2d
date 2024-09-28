@@ -1,0 +1,42 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/systems/physics_system.o",
+      "src/systems/physics_system.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/systems/physics_system.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/systems/physics_system.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/game.o",
+      "src/game.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/game.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/game.o"
+  }
+]
