@@ -1,6 +1,6 @@
 #pragma once
 
-#include "level_scene.h"
+#include "scenes/level_scene.h"
 
 namespace platformer2d {
 

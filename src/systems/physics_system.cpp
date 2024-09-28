@@ -1,3 +1,5 @@
+#include "systems/physics_system.h"
+
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -5,7 +7,6 @@
 #include <vector>
 
 #include "components.h"
-#include "physics_system.h"
 #include "constants.h"
 #include "raylib.h"
 

@@ -3,13 +3,13 @@
 #include <string>
 #include <unordered_map>
 
-#include "animation_system.h"
-#include "animation_state_system.h"
-#include "asset_manager.h"
 #include "components.h"
-#include "input_handler.h"
-#include "physics_system.h"
-#include "scene.h"
+#include "handlers/asset_handler.h"
+#include "handlers/input_handler.h"
+#include "scenes/scene.h"
+#include "systems/animation_state_system.h"
+#include "systems/animation_system.h"
+#include "systems/physics_system.h"
 
 namespace platformer2d {
 

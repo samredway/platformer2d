@@ -1,4 +1,5 @@
-#include "input_handler.h"
+#include "handlers/input_handler.h"
+
 #include "raylib.h"
 
 namespace platformer2d {

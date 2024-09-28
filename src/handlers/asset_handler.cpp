@@ -1,4 +1,4 @@
-#include "asset_manager.h"
+#include "handlers/asset_handler.h"
 
 namespace platformer2d {
 

@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "asset_manager.h"
 #include "components.h"
+#include "handlers/asset_handler.h"
 
 namespace platformer2d {
 
