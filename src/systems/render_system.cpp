@@ -20,14 +20,7 @@ void RenderSystem::draw() const {
     const PositionComponent& position{position_components_.at(entity_tag)};
     const Texture2D& texture{
         assets_.getTexture(render_pair.second.texture_name)};
-    constexpr float kRotation = 0.0;
-    // to get scale its 1/(actual_value/required_value) I am enforcing aligment
-    // by height so as blocks match for walking surface. Maybe I should just do
-    // this in an art program and allow scale as a compnent field so it can be
-    // tweaked at will though
-    const float scale = 1 / (texture.height / (float)position.height);
-    DrawTextureEx(texture, Vector2(position.x, position.y), kRotation, scale,
-                  WHITE);
+    DrawTexture(texture, position.x, position.y, WHITE);
   }
 }
 

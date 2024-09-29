@@ -1,5 +1,6 @@
 #include "systems/animation_system.h"
 
+#include "components.h"
 #include "constants.h"
 #include "raylib.h"
 
@@ -8,12 +9,13 @@ namespace platformer2d {
 AnimationSystem::AnimationSystem(
     std::unordered_map<std::string, AnimationComponent>& animations,
     std::unordered_map<std::string, PositionComponent>& positions,
+    std::unordered_map<std::string, MovementComponent>& movements,
     AssetManager& assets)
     : animations_(animations),
       positions_(positions),
+      movements_(movements),
       assets_(assets),
-      frame_number_(0) {
-}
+      frame_number_(0) {}
 
 void AnimationSystem::update() {
   frame_number_++;
@@ -26,17 +28,21 @@ void AnimationSystem::update() {
 
 void AnimationSystem::draw() const {
   for (const auto& pair : animations_) {
-    auto& position{positions_.at(pair.first)};
+    auto& position{getComponentOrPanic(positions_, pair.first)};
+    auto& movement{getComponentOrPanic(movements_, pair.first)};
     auto& animation{pair.second};
     std::string texture_name{
+        // TODO fix this so it panics if the texture name is not found
         animation.state_to_texture_name_map.at(animation.current_state)};
     Texture2D animation_frames{assets_.getTexture(texture_name)};
     int8_t num_frames{
+        // TODO fix this so it panics if the texture name is not found
         animation.state_to_num_frames_map.at(animation.current_state)};
 
     // Update the animation frame at a rate of roughly animation_fps
     int current_frame{static_cast<int>(
         frame_number_ /
+        // TODO fix this so it panics if the animation fps is not found
         (kTargetFPS * animation.animation_fps.at(animation.current_state)))};
     current_frame %= num_frames;
 
@@ -46,8 +52,9 @@ void AnimationSystem::draw() const {
     Rectangle frameRec = {sprite_pos_x, 0, sprite_width,
                           (float)animation_frames.height};
 
+    float scale = animation.scale;
+
     // Destination rectangle (this controls the position and scaling)
-    float scale = 1.3f;
     Rectangle destRec = {
         position.x,                             // Destination X position
         position.y,                             // Destination Y position
@@ -58,9 +65,9 @@ void AnimationSystem::draw() const {
     // Origin for rotation/scaling (set to the center of the texture)
     Vector2 origin = {0.0f, 0.0f};
 
-    // TODO Flip the sprite if moving left
-    if (!position.is_facing_right) {
-      frameRec.width = -sprite_width;  // Flip the sprite horizontally
+    if (!movement.is_facing_right) {
+      // Flip the sprite horizontally
+      frameRec.width = -sprite_width;
     }
 
     // Draw the texture using DrawTexturePro, which supports scaling

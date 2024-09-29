@@ -11,6 +11,8 @@ class AssetManager {
  public:
   ~AssetManager();
   void loadTexture(const std::string& name, const std::string& filename);
+  void loadTexture(const std::string& name, const std::string& filename,
+                   int width, int height);
   const Texture2D& getTexture(const std::string& name) const;
 
  private:

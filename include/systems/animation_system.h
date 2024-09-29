@@ -12,6 +12,7 @@ class AnimationSystem {
   AnimationSystem(
       std::unordered_map<std::string, AnimationComponent>& animations,
       std::unordered_map<std::string, PositionComponent>& positions,
+      std::unordered_map<std::string, MovementComponent>& movements,
       AssetManager& assets);
   void update();
   void draw() const;
@@ -19,6 +20,7 @@ class AnimationSystem {
  private:
   std::unordered_map<std::string, AnimationComponent>& animations_;
   std::unordered_map<std::string, PositionComponent>& positions_;
+  std::unordered_map<std::string, MovementComponent>& movements_;
   AssetManager& assets_;
   int frame_number_;
 };

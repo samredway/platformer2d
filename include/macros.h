@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdlib>  // For std::abort
-#include <iostream>
+#include <cstdlib>   // For std::abort
+#include <iostream>  // for std::cerr
 
 #define CHECK(condition, errstring)                                    \
   do {                                                                 \
@@ -17,6 +17,12 @@
 #else
 #define DCHECK(condition) ((void)0)  // No-op in release builds
 #endif
+
+#define PANIC(message)                 \
+  do {                                 \
+    std::cerr << message << std::endl; \
+    std::abort();                      \
+  } while (false)
 
 #ifndef NDEBUG
 #define DLOG(message)                  \

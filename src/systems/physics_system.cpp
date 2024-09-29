@@ -1,5 +1,3 @@
-#include "systems/physics_system.h"
-
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -9,6 +7,7 @@
 #include "components.h"
 #include "constants.h"
 #include "raylib.h"
+#include "systems/physics_system.h"
 
 namespace platformer2d {
 
@@ -18,7 +17,10 @@ RectangleSide getClosestRectangleSide(const PositionComponent& position,
                                       const PositionComponent& position2);
 void handleCollision(MovementComponent& movement_component,
                      PositionComponent& position,
-                     const PositionComponent& position2);
+                     const Vector2& offset_position,
+                     const Vector2& offset_position2,
+                     const CollisionComponent& collision_1,
+                     const CollisionComponent& collision_2);
 void updateVelocityY(MovementComponent& movement, float delta_time);
 void updateVelocityX(MovementComponent& movement, float delta_time);
 
@@ -29,8 +31,7 @@ PhysicsSystem::PhysicsSystem(
     std::unordered_map<std::string, CollisionComponent>& collision_components)
     : movement_components_(movement_components),
       position_components_(position_components),
-      collision_components_(collision_components) {
-}
+      collision_components_(collision_components) {}
 
 void PhysicsSystem::update() {
   const float dt = GetFrameTime();
@@ -51,16 +52,29 @@ void PhysicsSystem::update() {
         continue;
       }
 
+      // Get the collision components for the mover and the collider
+      auto& collision_1 = collision_components_.at(mover_entity_tag);
+      auto& collision_2 = collider_pair.second;
+
       const PositionComponent& position2 =
           position_components_.at(collider_pair.first);
 
-      const bool is_colliding = position.x <= position2.x + position2.width &&
-                                position.x + position.width >= position2.x &&
-                                position.y + position.height >= position2.y &&
-                                position.y <= position2.y + position2.height;
+      const float position_x = position.x + collision_1.offset_x;
+      const float position_y = position.y + collision_1.offset_y;
+      const float position2_x = position2.x + collision_2.offset_x;
+      const float position2_y = position2.y + collision_2.offset_y;
+
+      const bool is_colliding =
+          position_x <= position2_x + collision_2.width &&
+          position_x + collision_1.width >= position2_x &&
+          position_y + collision_1.height >= position2_y &&
+          position_y <= position2_y + collision_2.height;
 
       if (is_colliding) {
-        handleCollision(movement_component, position, position2);
+        const Vector2 position_offset{position_x, position_y};
+        const Vector2 position2_offset{position2_x, position2_y};
+        handleCollision(movement_component, position, position_offset,
+                        position2_offset, collision_1, collision_2);
       }
     }
 
@@ -79,13 +93,18 @@ constexpr float kCollisionOffset = 0.5f;
 // Helper function implementations
 enum class RectangleSide { kTop, kBottom, kRight, kLeft };
 
-RectangleSide getClosestRectangleSide(const PositionComponent& position,
-                                      const PositionComponent& position2) {
+RectangleSide getClosestRectangleSide(const Vector2& position,
+                                      const Vector2& position2,
+                                      const CollisionComponent& collision_1,
+                                      const CollisionComponent& collision_2) {
   const float bottom_diff =
-      std::abs(position2.y + position2.height) - position.y;
-  const float top_diff = std::abs(position.y + position.height) - position2.y;
-  const float left_diff = std::abs(position.x + position.width) - position2.x;
-  const float right_diff = std::abs(position2.x + position2.width) - position.x;
+      std::abs(position2.y + collision_2.height) - position.y;
+  const float top_diff =
+      std::abs(position.y + collision_1.height) - position2.y;
+  const float left_diff =
+      std::abs(position.x + collision_1.width) - position2.x;
+  const float right_diff =
+      std::abs(position2.x + collision_2.width) - position.x;
 
   const float min_dif =
       std::min({bottom_diff, top_diff, left_diff, right_diff});
@@ -102,26 +121,31 @@ RectangleSide getClosestRectangleSide(const PositionComponent& position,
 
 void handleCollision(MovementComponent& movement_component,
                      PositionComponent& position,
-                     const PositionComponent& position2) {
-  RectangleSide closest = getClosestRectangleSide(position, position2);
+                     const Vector2& offset_position,
+                     const Vector2& offset_position2,
+                     const CollisionComponent& collision_1,
+                     const CollisionComponent& collision_2) {
+  RectangleSide closest = getClosestRectangleSide(
+      offset_position, offset_position2, collision_1, collision_2);
   switch (closest) {
     case RectangleSide::kTop:
-      position.y = position2.y - position.height;
+      position.y = offset_position2.y - collision_1.height;
       movement_component.velocity_y = 0;
       movement_component.is_grounded = true;
       break;
     case RectangleSide::kLeft:
-      position.x = position2.x - position.width - kCollisionOffset;
+      position.x = offset_position2.x - collision_1.width - kCollisionOffset;
       movement_component.velocity_x = 0;
       movement_component.acceleration_x = 0;
       break;
     case RectangleSide::kRight:
-      position.x = position2.x + position.width + kCollisionOffset;
+      position.x = offset_position2.x + collision_1.width + kCollisionOffset;
       movement_component.velocity_x = 0;
       movement_component.acceleration_x = 0;
       break;
     case RectangleSide::kBottom:
-      // TODO: Implement behavior for bottom collision
+      position.y = offset_position2.y - collision_1.height;
+      movement_component.velocity_y = 0;
       break;
   }
 }

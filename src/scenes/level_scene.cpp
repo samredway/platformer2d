@@ -1,11 +1,8 @@
-#include "scenes/level_scene.h"
-
 #include <format>
 #include <string>
-#include <utility>
 
 #include "components.h"
-#include "raylib.h"
+#include "scenes/level_scene.h"
 
 namespace platformer2d {
 
@@ -18,16 +15,18 @@ LevelScene::LevelScene(const float width, const float height)
       input_handler_(),
       physics_(movement_components_, position_components_,
                collision_components_),
-      animation_system_(animation_components_, position_components_, assets_),
+      animation_system_(animation_components_, position_components_,
+                        movement_components_, assets_),
       animation_state_system_(animation_components_, movement_components_),
       render_system_(position_components_, render_components_, assets_) {}
 
 void LevelScene::init() {
   // Load textures
-  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png");
+  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png", 40,
+                      40);
   assets_.loadTexture("pink_monster_idle", "assets/Pink_Monster_Idle_4.png");
   assets_.loadTexture("pink_monster_run", "assets/Pink_Monster_Run_6.png");
-  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png");
+  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png", 40, 40);
 
   // Initialise player components
   initPlayer();
@@ -36,27 +35,26 @@ void LevelScene::init() {
   for (int i = 0; i < 8; i++) {
     const std::string tileTag{std::format("tile{}", i)};
     const float x{(width_ / 2.0f) - ((4.0f - i) * 40)};
-    position_components_.emplace(
-        tileTag, PositionComponent{x, (float)height_ - 40, 40, 40});
+    position_components_.emplace(tileTag,
+                                 PositionComponent{x, (float)height_ - 40});
     render_components_.emplace(tileTag, RenderComponent{"winter_ground_1"});
-    collision_components_.emplace(tileTag, CollisionComponent{});
+    collision_components_.emplace(tileTag, CollisionComponent{40, 40});
   }
 
   // Central tile to do x collision on
   const std::string tileTag{std::format("tile8")};
   const float x{(width_ / 2.0f) - 20};
-  position_components_.emplace(
-      tileTag, PositionComponent{x, (float)height_ - 80, 40, 40});
+  position_components_.emplace(tileTag,
+                               PositionComponent{x, (float)height_ - 80});
   render_components_.emplace(tileTag, RenderComponent{"ice_block"});
-  collision_components_.emplace(tileTag, CollisionComponent{});
+  collision_components_.emplace(tileTag, CollisionComponent{40, 40});
 }
 
 void LevelScene::initPlayer() {
   position_components_.emplace(
-      playerTag,
-      PositionComponent{(float)width_ / 2, (float)height_ / 2, 40, 40});
+      playerTag, PositionComponent{(float)width_ / 2, (float)height_ / 2});
   movement_components_.emplace(playerTag, MovementComponent{});
-  collision_components_.emplace(playerTag, CollisionComponent{});
+  collision_components_.emplace(playerTag, CollisionComponent{20, 40, 10, 0});
   AnimationComponent player_animation{};
   player_animation.current_state = AnimationState::kIdle;
   player_animation.state_to_num_frames_map[AnimationState::kIdle] = 4;
@@ -86,12 +84,10 @@ void LevelScene::draw() const {
 }
 
 void LevelScene::handleInput() {
-  // Would crash if player not defined somehow
-  auto& player_movement{movement_components_.at(playerTag)};
-  auto& position{position_components_.at(playerTag)};
-
-  // Get the keyboard input
   input_handler_.getInput();
+
+  MovementComponent& player_movement =
+      getComponentOrPanic(movement_components_, playerTag);
 
   const float rate_accleration{player_movement.walk_force /
                                player_movement.mass};
@@ -101,11 +97,11 @@ void LevelScene::handleInput() {
   if (input_handler_.isRight() && player_movement.is_grounded) {
     // Accelerate right
     player_movement.acceleration_x = rate_accleration;
-    position.is_facing_right = true;
+    player_movement.is_facing_right = true;
   } else if (input_handler_.isLeft() && player_movement.is_grounded) {
     // Accelerate left
     player_movement.acceleration_x = -rate_accleration;
-    position.is_facing_right = false;
+    player_movement.is_facing_right = false;
   } else {
     player_movement.acceleration_x = 0;
     // Artbitrary decelleration rate to mimic players own force in
