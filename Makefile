@@ -38,9 +38,7 @@ build/%.o: src/%.cpp
 
 # Clean rule to remove the compiled binary and object files
 clean:
-	find ./bin -type f -delete
-	find ./build/ -type f ! -name 'compile_commands.json' -delete
-	find ./build/ -type d  -delete
+	rm -rf build bin
 
 # Mark the `all`, `clean`, `debug`, and `release` as phony targets
 .PHONY: all clean debug release

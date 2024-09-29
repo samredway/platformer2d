@@ -12,12 +12,152 @@
       "-O0",
       "-c",
       "-o",
+      "build/scenes/level_scene.o",
+      "src/scenes/level_scene.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/scenes/level_scene.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/scenes/level_scene.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/systems/animation_state_system.o",
+      "src/systems/animation_state_system.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/systems/animation_state_system.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/systems/animation_state_system.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/systems/render_system.o",
+      "src/systems/render_system.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/systems/render_system.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/systems/render_system.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/systems/animation_system.o",
+      "src/systems/animation_system.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/systems/animation_system.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/systems/animation_system.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
       "build/systems/physics_system.o",
       "src/systems/physics_system.cpp"
     ],
     "directory": "/Users/samredway/development/cpp/games/platformer2d",
     "file": "/Users/samredway/development/cpp/games/platformer2d/src/systems/physics_system.cpp",
     "output": "/Users/samredway/development/cpp/games/platformer2d/build/systems/physics_system.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/handlers/asset_handler.o",
+      "src/handlers/asset_handler.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/handlers/asset_handler.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/handlers/asset_handler.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/handlers/input_handler.o",
+      "src/handlers/input_handler.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/handlers/input_handler.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/handlers/input_handler.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/main.o",
+      "src/main.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/src/main.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/main.o"
   },
   {
     "arguments": [
