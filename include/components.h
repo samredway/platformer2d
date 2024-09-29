@@ -1,10 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <string>
 #include <unordered_map>
-
-#include "systems/animation_state.h"
 
 namespace platformer2d {
 
@@ -33,6 +30,11 @@ struct MovementComponent {
 
 struct RenderComponent {
   std::string texture_name;
+};
+
+enum class AnimationState {
+  kIdle,
+  kRunning,
 };
 
 struct AnimationComponent {
