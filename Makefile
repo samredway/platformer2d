@@ -5,40 +5,50 @@ CXXFLAGS = -std=c++20 -Iinclude -Ilib -Wall -Wextra -Werror
 # Raylib library and framework dependencies
 LIBS = -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL lib/libraylib.a
 
-# Automatically find all source files in the src directory and subdirectories
+# Source files (excluding main.cpp files in cmd/)
 SRCS = $(shell find src -type f -name "*.cpp")
 
-# Convert source files into corresponding object files in the build directory
+# Object files
 OBJS = $(patsubst src/%.cpp, build/%.o, $(SRCS))
 
-# Target binary
-TARGET = bin/game
+# Targets
+GAME_TARGET = bin/game
+LEVEL_EDITOR_TARGET = bin/level_editor
 
-# Default build is a debug build
+# Default build is a debug build for both targets
 all: debug
 
 # Debug build
-debug: CXXFLAGS += -g -O0  # Debug symbols, no optimization
-debug: $(TARGET)
+debug: CXXFLAGS += -g -O0
+debug: $(GAME_TARGET) $(LEVEL_EDITOR_TARGET)
 
 # Release build
-release: CXXFLAGS += -O2 -DNDEBUG  # Optimization, disable assertions
-release: $(TARGET)
+release: CXXFLAGS += -O2 -DNDEBUG
+release: $(GAME_TARGET) $(LEVEL_EDITOR_TARGET)
 
-# Linking the object files to create the binary
-$(TARGET): $(OBJS)
-	@mkdir -p bin  # Ensure bin directory exists
-	$(CXX) $(CXXFLAGS) $(OBJS) $(LIBS) -o $(TARGET)
+# Game target
+$(GAME_TARGET): $(OBJS) build/cmd/game/main.o
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
-# Rule to compile individual source files into object files
-# This also ensures the necessary directories in `build/` are created
-build/%.o: src/%.cpp
-	@mkdir -p $(dir $@)  # Ensure the subdirectories in `build/` exist
+# Level editor target
+$(LEVEL_EDITOR_TARGET): $(OBJS) build/cmd/level_editor/main.o
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
+
+# Rule for compiling main.cpp files
+build/cmd/%.o: cmd/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean rule to remove the compiled binary and object files
+# Rule for compiling other source files
+build/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean rule
 clean:
 	rm -rf build bin
 
-# Mark the `all`, `clean`, `debug`, and `release` as phony targets
+# Phony targets
 .PHONY: all clean debug release

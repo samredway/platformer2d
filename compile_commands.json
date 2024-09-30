@@ -12,11 +12,31 @@
       "-O0",
       "-c",
       "-o",
-      "build/components/animation_component.o",
-      "src/components/animation_component.cpp"
+      "build/cmd/game/main.o",
+      "cmd/game/main.cpp"
     ],
     "directory": "/Users/samredway/development/cpp/games/platformer2d",
-    "file": "/Users/samredway/development/cpp/games/platformer2d/src/components/animation_component.cpp",
-    "output": "/Users/samredway/development/cpp/games/platformer2d/build/components/animation_component.o"
+    "file": "/Users/samredway/development/cpp/games/platformer2d/cmd/game/main.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/cmd/game/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-Iinclude",
+      "-Ilib",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/cmd/level_editor/main.o",
+      "cmd/level_editor/main.cpp"
+    ],
+    "directory": "/Users/samredway/development/cpp/games/platformer2d",
+    "file": "/Users/samredway/development/cpp/games/platformer2d/cmd/level_editor/main.cpp",
+    "output": "/Users/samredway/development/cpp/games/platformer2d/build/cmd/level_editor/main.o"
   }
 ]
