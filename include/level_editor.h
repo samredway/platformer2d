@@ -19,6 +19,7 @@ class LevelEditor {
   LevelEditor& operator=(LevelEditor&&) = delete;
 
   // public methods
+  void init();
   void update();
   void draw() const;
 
