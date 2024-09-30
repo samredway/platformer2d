@@ -1,10 +1,10 @@
-#include "scenes/level_scene.h"
-
 #include <format>
 #include <string>
 
 #include "components/animation_component.h"
 #include "components/movement_component.h"
+#include "constants.h"
+#include "scenes/level_scene.h"
 
 namespace platformer2d {
 
@@ -24,11 +24,11 @@ LevelScene::LevelScene(const float width, const float height)
 
 void LevelScene::init() {
   // Load textures
-  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png", 40,
-                      40);
+  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png", 50,
+                      50);
   assets_.loadTexture("pink_monster_idle", "assets/Pink_Monster_Idle_4.png");
   assets_.loadTexture("pink_monster_run", "assets/Pink_Monster_Run_6.png");
-  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png", 40, 40);
+  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png", 50, 50);
 
   // Initialise player components
   initPlayer();
@@ -36,21 +36,23 @@ void LevelScene::init() {
   // Floor tiles
   for (int i = 0; i < 8; i++) {
     const std::string tileTag{std::format("tile{}", i)};
-    const float x{(width_ / 2.0f) - ((4.0f - i) * 40)};
+    const float x{(width_ / 2.0f) - ((4.0f - i) * kTileSize)};
     position_components_.emplace(
-        tileTag, PositionComponent{tileTag, x, (float)height_ - 40});
+        tileTag, PositionComponent{tileTag, x, (float)height_ - kTileSize});
     render_components_.emplace(tileTag,
                                RenderComponent{tileTag, "winter_ground_1"});
-    collision_components_.emplace(tileTag, CollisionComponent{tileTag, 40, 40});
+    collision_components_.emplace(
+        tileTag, CollisionComponent{tileTag, kTileSize, kTileSize});
   }
 
   // Central tile to do x collision on
   const std::string tileTag{std::format("tile8")};
-  const float x{(width_ / 2.0f) - 20};
+  const float x{(width_ / 2.0f) - kTileSize / 2};
   position_components_.emplace(
-      tileTag, PositionComponent{tileTag, x, (float)height_ - 80});
+      tileTag, PositionComponent{tileTag, x, (float)height_ - kTileSize * 2});
   render_components_.emplace(tileTag, RenderComponent{tileTag, "ice_block"});
-  collision_components_.emplace(tileTag, CollisionComponent{tileTag, 40, 40});
+  collision_components_.emplace(
+      tileTag, CollisionComponent{tileTag, kTileSize, kTileSize});
 }
 
 void LevelScene::initPlayer() {
