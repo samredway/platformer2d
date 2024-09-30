@@ -2,7 +2,9 @@
 
 #include <unordered_map>
 
-#include "components.h"
+#include "components/collision_component.h"
+#include "components/movement_component.h"
+#include "components/position_component.h"
 
 namespace platformer2d {
 

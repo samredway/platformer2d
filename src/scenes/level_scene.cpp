@@ -1,8 +1,10 @@
+#include "scenes/level_scene.h"
+
 #include <format>
 #include <string>
 
-#include "components.h"
-#include "scenes/level_scene.h"
+#include "components/animation_component.h"
+#include "components/movement_component.h"
 
 namespace platformer2d {
 
@@ -35,36 +37,39 @@ void LevelScene::init() {
   for (int i = 0; i < 8; i++) {
     const std::string tileTag{std::format("tile{}", i)};
     const float x{(width_ / 2.0f) - ((4.0f - i) * 40)};
-    position_components_.emplace(tileTag,
-                                 PositionComponent{x, (float)height_ - 40});
-    render_components_.emplace(tileTag, RenderComponent{"winter_ground_1"});
-    collision_components_.emplace(tileTag, CollisionComponent{40, 40});
+    position_components_.emplace(
+        tileTag, PositionComponent{tileTag, x, (float)height_ - 40});
+    render_components_.emplace(tileTag,
+                               RenderComponent{tileTag, "winter_ground_1"});
+    collision_components_.emplace(tileTag, CollisionComponent{tileTag, 40, 40});
   }
 
   // Central tile to do x collision on
   const std::string tileTag{std::format("tile8")};
   const float x{(width_ / 2.0f) - 20};
-  position_components_.emplace(tileTag,
-                               PositionComponent{x, (float)height_ - 80});
-  render_components_.emplace(tileTag, RenderComponent{"ice_block"});
-  collision_components_.emplace(tileTag, CollisionComponent{40, 40});
+  position_components_.emplace(
+      tileTag, PositionComponent{tileTag, x, (float)height_ - 80});
+  render_components_.emplace(tileTag, RenderComponent{tileTag, "ice_block"});
+  collision_components_.emplace(tileTag, CollisionComponent{tileTag, 40, 40});
 }
 
 void LevelScene::initPlayer() {
   position_components_.emplace(
-      playerTag, PositionComponent{(float)width_ / 2, (float)height_ / 2});
-  movement_components_.emplace(playerTag, MovementComponent{});
-  collision_components_.emplace(playerTag, CollisionComponent{20, 40, 10, 0});
-  AnimationComponent player_animation{};
+      playerTag,
+      PositionComponent{playerTag, (float)width_ / 2, (float)height_ / 2});
+  movement_components_.emplace(playerTag, MovementComponent{playerTag});
+  collision_components_.emplace(playerTag,
+                                CollisionComponent{playerTag, 20, 40, 10, 0});
+  AnimationComponent player_animation{playerTag, 1.3f};
   player_animation.current_state = AnimationState::kIdle;
-  player_animation.state_to_num_frames_map[AnimationState::kIdle] = 4;
-  player_animation.state_to_texture_name_map[AnimationState::kIdle] =
-      "pink_monster_idle";
-  player_animation.state_to_texture_name_map[AnimationState::kRunning] =
-      "pink_monster_run";
-  player_animation.state_to_num_frames_map[AnimationState::kRunning] = 6;
-  player_animation.animation_fps[AnimationState::kIdle] = 0.4f;
-  player_animation.animation_fps[AnimationState::kRunning] = 0.1f;
+  player_animation.setStateToNumFrames(AnimationState::kIdle, 4);
+  player_animation.setStateToNumFrames(AnimationState::kRunning, 6);
+  player_animation.setStateToTextureName(AnimationState::kIdle,
+                                         "pink_monster_idle");
+  player_animation.setStateToTextureName(AnimationState::kRunning,
+                                         "pink_monster_run");
+  player_animation.setStateToAnimationFPS(AnimationState::kIdle, 0.4f);
+  player_animation.setStateToAnimationFPS(AnimationState::kRunning, 0.1f);
   animation_components_.emplace(playerTag, player_animation);
 }
 
@@ -87,20 +92,20 @@ void LevelScene::handleInput() {
   input_handler_.getInput();
 
   MovementComponent& player_movement =
-      getComponentOrPanic(movement_components_, playerTag);
+      getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 
-  const float rate_accleration{player_movement.walk_force /
-                               player_movement.mass};
+  const float rate_acceleration{player_movement.walk_force /
+                                player_movement.mass};
 
   // Accelerate in direction pressed.
   // If nothing pressed then decellerate unless at rest then stop
   if (input_handler_.isRight() && player_movement.is_grounded) {
     // Accelerate right
-    player_movement.acceleration_x = rate_accleration;
+    player_movement.acceleration_x = rate_acceleration;
     player_movement.is_facing_right = true;
   } else if (input_handler_.isLeft() && player_movement.is_grounded) {
     // Accelerate left
-    player_movement.acceleration_x = -rate_accleration;
+    player_movement.acceleration_x = -rate_acceleration;
     player_movement.is_facing_right = false;
   } else {
     player_movement.acceleration_x = 0;

@@ -3,7 +3,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "components.h"
+#include "components/position_component.h"
+#include "components/render_component.h"
 #include "handlers/asset_handler.h"
 
 namespace platformer2d {

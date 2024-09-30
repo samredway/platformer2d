@@ -3,7 +3,11 @@
 #include <string>
 #include <unordered_map>
 
-#include "components.h"
+#include "components/animation_component.h"
+#include "components/collision_component.h"
+#include "components/movement_component.h"
+#include "components/position_component.h"
+#include "components/render_component.h"
 #include "handlers/asset_handler.h"
 #include "handlers/input_handler.h"
 #include "scenes/scene.h"

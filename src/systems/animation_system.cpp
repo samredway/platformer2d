@@ -1,6 +1,5 @@
 #include "systems/animation_system.h"
 
-#include "components.h"
 #include "constants.h"
 #include "raylib.h"
 
@@ -28,22 +27,18 @@ void AnimationSystem::update() {
 
 void AnimationSystem::draw() const {
   for (const auto& pair : animations_) {
-    auto& position{getComponentOrPanic(positions_, pair.first)};
-    auto& movement{getComponentOrPanic(movements_, pair.first)};
+    auto& position{
+        getComponentOrPanic<PositionComponent>(positions_, pair.first)};
+    auto& movement{
+        getComponentOrPanic<MovementComponent>(movements_, pair.first)};
     auto& animation{pair.second};
-    std::string texture_name{
-        // TODO fix this so it panics if the texture name is not found
-        animation.state_to_texture_name_map.at(animation.current_state)};
+    std::string texture_name{animation.getCurrentTextureName()};
     Texture2D animation_frames{assets_.getTexture(texture_name)};
-    int8_t num_frames{
-        // TODO fix this so it panics if the texture name is not found
-        animation.state_to_num_frames_map.at(animation.current_state)};
+    int8_t num_frames{animation.getCurrentNumFrames()};
 
     // Update the animation frame at a rate of roughly animation_fps
     int current_frame{static_cast<int>(
-        frame_number_ /
-        // TODO fix this so it panics if the animation fps is not found
-        (kTargetFPS * animation.animation_fps.at(animation.current_state)))};
+        frame_number_ / (kTargetFPS * animation.getCurrentAnimationFPS()))};
     current_frame %= num_frames;
 
     const float sprite_width = (float)animation_frames.width / num_frames;
