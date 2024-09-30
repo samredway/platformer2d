@@ -18,10 +18,11 @@
 #define DCHECK(condition) ((void)0)  // No-op in release builds
 #endif
 
-#define PANIC(message)                 \
-  do {                                 \
-    std::cerr << message << std::endl; \
-    std::abort();                      \
+#define PANIC(err_message)                                           \
+  do {                                                               \
+    std::cerr << "Panic: " << err_message << " in file " << __FILE__ \
+              << " at line " << __LINE__ << std::endl;               \
+    std::abort();                                                    \
   } while (false)
 
 #ifndef NDEBUG
