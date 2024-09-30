@@ -24,6 +24,7 @@ class Game {
  private:
   const int screen_width_;
   const int screen_height_;
+  Color background_color_;
   LevelScene level_;
 };
 
