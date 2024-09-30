@@ -12,26 +12,6 @@
       "-O0",
       "-c",
       "-o",
-      "build/cmd/game/main.o",
-      "cmd/game/main.cpp"
-    ],
-    "directory": "/Users/samredway/development/cpp/games/platformer2d",
-    "file": "/Users/samredway/development/cpp/games/platformer2d/cmd/game/main.cpp",
-    "output": "/Users/samredway/development/cpp/games/platformer2d/build/cmd/game/main.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/clang++",
-      "-std=c++20",
-      "-Iinclude",
-      "-Ilib",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-g",
-      "-O0",
-      "-c",
-      "-o",
       "build/cmd/level_editor/main.o",
       "cmd/level_editor/main.cpp"
     ],

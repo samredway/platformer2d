@@ -8,6 +8,16 @@ class Game {
  public:
   Game(int width, int height);
   ~Game();
+
+  // Deltete copy consturctors
+  Game(const Game& other) = delete;
+  Game& operator=(const Game& other) = delete;
+
+  // Delete move constructors
+  Game(Game&& other) = delete;
+  Game operator=(Game&& other) = delete;
+
+  // Public methods
   void update();
   void draw() const;
 
