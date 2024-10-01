@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "raylib.h"
 #include "scenes/level_editor.h"
+#include "scenes/level_scene.h"
 
 namespace platformer2d {
 
