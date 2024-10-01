@@ -99,8 +99,6 @@ void LevelScene::draw() const {
 }
 
 void LevelScene::handleInput() {
-  input_manager_.getInput();
-
   MovementComponent& player_movement =
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 

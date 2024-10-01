@@ -16,6 +16,7 @@ class Scene {
         input_manager_(input_manager) {}
 
   virtual ~Scene() = default;
+  virtual void handleInput() = 0;
   virtual void update() = 0;
   virtual void draw() const = 0;
   virtual void init() = 0;
