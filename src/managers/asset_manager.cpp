@@ -1,6 +1,8 @@
-#include "handlers/asset_handler.h"
+#include "managers/asset_manager.h"
 
 namespace platformer2d {
+
+AssetManager::AssetManager() {}
 
 void AssetManager::loadTexture(const std::string& name,
                                const std::string& filename) {

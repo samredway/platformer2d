@@ -8,8 +8,8 @@
 #include "components/movement_component.h"
 #include "components/position_component.h"
 #include "components/render_component.h"
-#include "handlers/asset_handler.h"
-#include "handlers/input_handler.h"
+#include "managers/asset_manager.h"
+#include "managers/input_manager.h"
 #include "scenes/scene.h"
 #include "systems/animation_state_system.h"
 #include "systems/animation_system.h"
@@ -18,12 +18,13 @@
 
 namespace platformer2d {
 
-class LevelScene : Scene {
+class LevelScene : public Scene {
  public:
-  LevelScene(const float width, const float height);
+  LevelScene(AssetManager& asset_manager, InputManager& input_manager,
+             const float width, const float height);
   void draw() const override;
   void update() override;
-  void init();
+  void init() override;
 
  private:
   void handleInput();
@@ -34,8 +35,6 @@ class LevelScene : Scene {
   const float height_;
 
   // Owned systems
-  AssetManager assets_;
-  InputHandler input_handler_;
   PhysicsSystem physics_;
   AnimationSystem animation_system_;
   AnimationStateSystem animation_state_system_;

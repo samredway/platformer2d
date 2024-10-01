@@ -5,6 +5,7 @@
 namespace platformer2d {
 
 struct RenderComponent : Component {
+  RenderComponent() = default;
   RenderComponent(const std::string& tag, const std::string& texture_name);
   std::string texture_name;
 };

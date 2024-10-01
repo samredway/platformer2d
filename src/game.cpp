@@ -1,29 +1,63 @@
-#include "constants.h"
 #include "game.h"
+
+#include "constants.h"
+#include "macros.h"
 #include "raylib.h"
+#include "scenes/level_editor.h"
 
 namespace platformer2d {
 
 Game::Game(int width, int height)
     : screen_width_(width),
       screen_height_(height),
-      background_color_(SKYBLUE),
-      level_(width, height) {
+      input_manager_(),
+      asset_manager_(),
+      scenes_() {
   // Setup Window
   InitWindow(screen_width_, screen_height_, "2D Platform Game");
   SetTargetFPS(kTargetFPS);
-  level_.init();
+  scenes_["level"] = std::make_unique<LevelScene>(
+      asset_manager_, input_manager_, width, height);
+  scenes_["level"]->init();
+  current_scene_ = scenes_["level"].get();
+
+#ifndef NDEBUG
+  scenes_["editor"] = std::make_unique<LevelEditor>(
+      asset_manager_, input_manager_, width, height);
+  scenes_["editor"]->init();
+#endif
 }
 
 Game::~Game() { CloseWindow(); }
 
-void Game::update() { level_.update(); }
+void Game::update() {
+  input_manager_.getInput();
+#ifndef NDEBUG
+  // Toggle editor mode
+  if (input_manager_.isE()) {
+    if (current_scene_->name() == "level") {
+      setCurrentScene("editor");
+    } else {
+      setCurrentScene("level");
+    }
+  }
+#endif
+  current_scene_->update();
+}
 
 void Game::draw() const {
   BeginDrawing();
-  ClearBackground(background_color_);
-  level_.draw();
+  current_scene_->draw();
   EndDrawing();
+}
+
+void Game::setCurrentScene(const std::string& scene_name) {
+  auto it = scenes_.find(scene_name);
+  if (it != scenes_.end()) {
+    current_scene_ = it->second.get();
+  } else {
+    PANIC("Scene not found");
+  }
 }
 
 }  // namespace platformer2d

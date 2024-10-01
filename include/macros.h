@@ -26,9 +26,9 @@
   } while (false)
 
 #ifndef NDEBUG
-#define DLOG(message)                  \
-  do {                                 \
-    std::cout << message << std::endl; \
+#define DLOG(message)                               \
+  do {                                              \
+    std::cout << "DEBUG: " << message << std::endl; \
   } while (false)
 #else
 #define DLOG(message) ((void)0)

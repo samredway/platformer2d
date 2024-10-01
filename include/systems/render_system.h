@@ -5,7 +5,7 @@
 
 #include "components/position_component.h"
 #include "components/render_component.h"
-#include "handlers/asset_handler.h"
+#include "managers/asset_manager.h"
 
 namespace platformer2d {
 

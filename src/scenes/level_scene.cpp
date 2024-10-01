@@ -4,31 +4,37 @@
 #include "components/animation_component.h"
 #include "components/movement_component.h"
 #include "constants.h"
+#include "raylib.h"
 #include "scenes/level_scene.h"
+#include "scenes/scene.h"
 
 namespace platformer2d {
 
 const std::string playerTag{"player"};
 
-LevelScene::LevelScene(const float width, const float height)
-    : width_(width),
+LevelScene::LevelScene(AssetManager& asset_manager, InputManager& input_manager,
+                       const float width, const float height)
+    : Scene("level", SKYBLUE, asset_manager, input_manager),
+      width_(width),
       height_(height),
-      assets_(),
-      input_handler_(),
       physics_(movement_components_, position_components_,
                collision_components_),
       animation_system_(animation_components_, position_components_,
-                        movement_components_, assets_),
+                        movement_components_, asset_manager_),
       animation_state_system_(animation_components_, movement_components_),
-      render_system_(position_components_, render_components_, assets_) {}
+      render_system_(position_components_, render_components_, asset_manager_) {
+}
 
 void LevelScene::init() {
   // Load textures
-  assets_.loadTexture("winter_ground_1", "assets/winter_ground/ground1.png", 50,
-                      50);
-  assets_.loadTexture("pink_monster_idle", "assets/Pink_Monster_Idle_4.png");
-  assets_.loadTexture("pink_monster_run", "assets/Pink_Monster_Run_6.png");
-  assets_.loadTexture("ice_block", "assets/winter_ground/ice.png", 50, 50);
+  asset_manager_.loadTexture("winter_ground_1",
+                             "assets/winter_ground/ground1.png", 50, 50);
+  asset_manager_.loadTexture("pink_monster_idle",
+                             "assets/Pink_Monster_Idle_4.png");
+  asset_manager_.loadTexture("pink_monster_run",
+                             "assets/Pink_Monster_Run_6.png");
+  asset_manager_.loadTexture("ice_block", "assets/winter_ground/ice.png", 50,
+                             50);
 
   // Initialise player components
   initPlayer();
@@ -83,6 +89,8 @@ void LevelScene::update() {
 }
 
 void LevelScene::draw() const {
+  ClearBackground(background_color_);
+
   // Draw static components (Tiles)
   render_system_.draw();
 
@@ -91,7 +99,7 @@ void LevelScene::draw() const {
 }
 
 void LevelScene::handleInput() {
-  input_handler_.getInput();
+  input_manager_.getInput();
 
   MovementComponent& player_movement =
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
@@ -101,11 +109,11 @@ void LevelScene::handleInput() {
 
   // Accelerate in direction pressed.
   // If nothing pressed then decellerate unless at rest then stop
-  if (input_handler_.isRight() && player_movement.is_grounded) {
+  if (input_manager_.isRight() && player_movement.is_grounded) {
     // Accelerate right
     player_movement.acceleration_x = rate_acceleration;
     player_movement.is_facing_right = true;
-  } else if (input_handler_.isLeft() && player_movement.is_grounded) {
+  } else if (input_manager_.isLeft() && player_movement.is_grounded) {
     // Accelerate left
     player_movement.acceleration_x = -rate_acceleration;
     player_movement.is_facing_right = false;
@@ -119,7 +127,7 @@ void LevelScene::handleInput() {
   }
 
   // Jump
-  if (input_handler_.isSpace() && player_movement.is_grounded) {
+  if (input_manager_.isSpace() && player_movement.is_grounded) {
     player_movement.acceleration_y = player_movement.jump_force;
   } else if (player_movement.acceleration_y > 0) {
     player_movement.acceleration_y = 0;

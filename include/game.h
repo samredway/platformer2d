@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scenes/level_scene.h"
+#include "scenes/scene.h"
 
 namespace platformer2d {
 
@@ -24,8 +25,12 @@ class Game {
  private:
   const int screen_width_;
   const int screen_height_;
-  Color background_color_;
-  LevelScene level_;
+  InputManager input_manager_;
+  AssetManager asset_manager_;
+  std::unordered_map<std::string, std::unique_ptr<Scene>> scenes_;
+  Scene* current_scene_ = nullptr;
+
+  void setCurrentScene(const std::string& scene_name);
 };
 
 }  // namespace platformer2d

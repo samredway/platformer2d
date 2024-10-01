@@ -3,12 +3,14 @@
 #include <string>
 #include <unordered_map>
 
+#include "managers/manager.h"
 #include "raylib.h"
 
 namespace platformer2d {
 
-class AssetManager {
+class AssetManager : public Manager {
  public:
+  AssetManager();
   ~AssetManager();
   void loadTexture(const std::string& name, const std::string& filename);
   void loadTexture(const std::string& name, const std::string& filename,
