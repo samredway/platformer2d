@@ -16,7 +16,6 @@ class Scene {
         input_manager_(input_manager) {}
 
   virtual ~Scene() = default;
-  virtual void handleInput() = 0;
   virtual void update() = 0;
   virtual void draw() const = 0;
   virtual void init() = 0;
@@ -29,6 +28,8 @@ class Scene {
   Color background_color_;
   AssetManager& asset_manager_;
   InputManager& input_manager_;
+
+  virtual void handleInput() = 0;  // Moved from private to protected
 };
 
 }  // namespace platformer2d

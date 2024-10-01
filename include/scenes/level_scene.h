@@ -27,7 +27,7 @@ class LevelScene : public Scene {
   void init() override;
 
  private:
-  void handleInput();
+  void handleInput() override;
   void processRendering() const;
   void initPlayer();
 

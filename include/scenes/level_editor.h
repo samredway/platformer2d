@@ -13,7 +13,6 @@ class LevelEditor : public Scene {
   LevelEditor(AssetManager& asset_manager, InputManager& input_manager,
               float width, float height);
 
-  void handleInput() override;
   void init() override;
   void update() override;
   void draw() const override;
@@ -24,6 +23,7 @@ class LevelEditor : public Scene {
   TileMap tile_map_;
 
   // Private methods
+  void handleInput() override;
   void drawGrid() const;
 };
 
