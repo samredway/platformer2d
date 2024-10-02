@@ -1,6 +1,5 @@
-#include "game.h"
-
 #include "constants.h"
+#include "game.h"
 #include "macros.h"
 #include "raylib.h"
 #include "scenes/level_editor.h"

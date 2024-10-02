@@ -9,11 +9,9 @@ class Manager {
   Manager() = default;
   virtual ~Manager() = default;
 
-  // Delete move constructors
+  // Delete copy and move constructors
   Manager(Manager&&) = delete;
   Manager& operator=(Manager&&) = delete;
-
-  // Delete copy constructors
   Manager(const Manager&) = delete;
   Manager& operator=(const Manager&) = delete;
 };

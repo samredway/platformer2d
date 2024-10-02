@@ -1,3 +1,4 @@
+#include "macros.h"
 #include "managers/input_manager.h"
 #include "raylib.h"
 
@@ -20,9 +21,7 @@ void InputManager::getInput() {
   is_space_ = IsKeyDown(KEY_SPACE);
 
 #ifndef NDEBUG
-  if (IsKeyPressed(KEY_E)) {
-    is_e_ = !is_e_;
-  }
+  is_e_ = IsKeyPressed(KEY_E) ? true : false;
 #endif
 }
 
