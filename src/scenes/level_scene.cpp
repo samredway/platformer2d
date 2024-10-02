@@ -33,7 +33,7 @@ void LevelScene::init() {
                              "assets/Pink_Monster_Idle_4.png");
   asset_manager_.loadTexture("pink_monster_run",
                              "assets/Pink_Monster_Run_6.png");
-  asset_manager_.loadTexture("ice_block", "assets/winter_ground/ice.png", 50,
+  asset_manager_.loadTexture("winter_ice", "assets/winter_ground/ice.png", 50,
                              50);
 
   // Initialise player components

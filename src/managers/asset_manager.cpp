@@ -7,7 +7,11 @@ AssetManager::AssetManager() {}
 void AssetManager::loadTexture(const std::string& name,
                                const std::string& filename) {
   Texture2D texture = LoadTexture(filename.c_str());
-  textures_[name] = texture;
+  // Dont overwrite existing textures
+  auto it = textures_.find(name);
+  if (it == textures_.end()) {
+    textures_[name] = texture;
+  }
 }
 
 void AssetManager::loadTexture(const std::string& name,

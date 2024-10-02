@@ -21,6 +21,12 @@ Game::Game(int width, int height)
   // Setup Window
   InitWindow(screen_width_, screen_height_, "2D Platform Game");
   SetTargetFPS(kTargetFPS);
+
+  // Currently we load the asset manager with all textures in a lazy fashion
+  // as they are needed. However all textures are held in RAM all the time
+  // if this becomes a problem we may need to let each scene load and destruct
+  // its own textures so as only to hold the textures in RAM that are required
+  // in the given scene
   scenes_["level"] = std::make_unique<LevelScene>(
       asset_manager_, input_manager_, width, height);
   scenes_["level"]->init();
