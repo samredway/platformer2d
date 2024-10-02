@@ -20,22 +20,22 @@ LevelEditor::LevelEditor(AssetManager& asset_manager,
 
 void LevelEditor::init() {
   // Load in all the Tile textures
-  asset_manager_.loadTexture("assets/winter_ground_0", "ground0.png");
-  asset_manager_.loadTexture("assets/winter_ground_1", "ground1.png");
-  asset_manager_.loadTexture("assets/winter_ground_2", "ground2.png");
-  asset_manager_.loadTexture("assets/winter_ground_3", "ground3.png");
-  asset_manager_.loadTexture("assets/winter_ground_4", "ground4.png");
-  asset_manager_.loadTexture("assets/winter_ground_5", "ground5.png");
-  asset_manager_.loadTexture("assets/winter_ground_6", "ground6.png");
-  asset_manager_.loadTexture("assets/winter_ground_7", "ground7.png");
-  asset_manager_.loadTexture("assets/winter_ground_8", "ground8.png");
-  asset_manager_.loadTexture("assets/winter_ground_9", "ground9.png");
-  asset_manager_.loadTexture("assets/winter_groundIce1", "groundIce1.png");
-  asset_manager_.loadTexture("assets/winter_groundIce2", "groundIce2.png");
-  asset_manager_.loadTexture("assets/winter_groundIce3", "groundIce3.png");
-  asset_manager_.loadTexture("assets/winter_groundl", "groundl.png");
-  asset_manager_.loadTexture("assets/winter_groundr", "groundr.png");
-  asset_manager_.loadTexture("assets/winter_ice", "ice.png");
+  asset_manager_.loadTexture("winter_ground_0", "assets/ground0.png");
+  asset_manager_.loadTexture("winter_ground_1", "assets/ground1.png");
+  asset_manager_.loadTexture("winter_ground_2", "assets/ground2.png");
+  asset_manager_.loadTexture("winter_ground_3", "assets/ground3.png");
+  asset_manager_.loadTexture("winter_ground_4", "assets/ground4.png");
+  asset_manager_.loadTexture("winter_ground_5", "assets/ground5.png");
+  asset_manager_.loadTexture("winter_ground_6", "assets/ground6.png");
+  asset_manager_.loadTexture("winter_ground_7", "assets/ground7.png");
+  asset_manager_.loadTexture("winter_ground_8", "assets/ground8.png");
+  asset_manager_.loadTexture("winter_ground_9", "assets/ground9.png");
+  asset_manager_.loadTexture("winter_groundIce1", "assets/groundIce1.png");
+  asset_manager_.loadTexture("winter_groundIce2", "assets/groundIce2.png");
+  asset_manager_.loadTexture("winter_groundIce3", "assets/groundIce3.png");
+  asset_manager_.loadTexture("winter_groundl", "assets/groundl.png");
+  asset_manager_.loadTexture("winter_groundr", "assets/groundr.png");
+  asset_manager_.loadTexture("winter_ice", "assets/ice.png");
 
   // TODO load in character sprites and select single animation frame
   // to place them
@@ -49,6 +49,11 @@ void LevelEditor::update() {
 
 void LevelEditor::handleInput() {
   // Handle input for the level editor
+  if (input_manager_.mouseClicked()) {
+    int tile_count_x = (input_manager_.getMousePositionX() / kTileSize) + 1;
+    int tile_count_y = (input_manager_.getMousePositionY() / kTileSize) + 1;
+    tile_map_.addTile(tile_count_x, tile_count_y);
+  }
 }
 
 void LevelEditor::draw() const {

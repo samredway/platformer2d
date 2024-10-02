@@ -1,3 +1,6 @@
+#include <optional>
+
+#include "macros.h"
 #include "managers/asset_manager.h"
 
 namespace platformer2d {
@@ -24,7 +27,13 @@ void AssetManager::loadTexture(const std::string& name,
 }
 
 const Texture2D& AssetManager::getTexture(const std::string& name) const {
-  return textures_.at(name);
+  auto it = textures_.find(name);
+  if (it == textures_.end()) {
+    PANIC("texuture " << name
+                      << " not in AssetManager.textures_ : maybe a misnamed "
+                         "file or texture name?");
+  }
+  return it->second;
 }
 
 AssetManager::~AssetManager() {

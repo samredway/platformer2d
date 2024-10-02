@@ -56,7 +56,7 @@ void LevelScene::init() {
   const float x{(width_ / 2.0f) - kTileSize / 2};
   position_components_.emplace(
       tileTag, PositionComponent{tileTag, x, (float)height_ - kTileSize * 2});
-  render_components_.emplace(tileTag, RenderComponent{tileTag, "ice_block"});
+  render_components_.emplace(tileTag, RenderComponent{tileTag, "winter_ice"});
   collision_components_.emplace(
       tileTag, CollisionComponent{tileTag, kTileSize, kTileSize});
 }

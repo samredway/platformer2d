@@ -11,7 +11,8 @@ namespace platformer2d {
 class TileMap {
  public:
   TileMap();
-  void addTile();
+  // TODO handle error if tile out of bounds?
+  void addTile(int tile_count_x, int tile_count_y);
   void removeTile();
   void draw() const;
 

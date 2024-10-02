@@ -45,7 +45,7 @@ void Game::update() {
   input_manager_.getInput();
 #ifndef NDEBUG
   // Toggle editor mode
-  if (input_manager_.isE()) {
+  if (input_manager_.isEPressed()) {
     if (current_scene_->name() == "level") {
       setCurrentScene("editor");
     } else {

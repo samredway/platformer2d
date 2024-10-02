@@ -13,7 +13,10 @@ class InputManager : public Manager {
   bool isSpace() const;
 
 #ifndef NDEBUG
-  bool isE() const;
+  bool isEPressed() const;
+  bool mouseClicked() const;
+  int getMousePositionX() const;
+  int getMousePositionY() const;
 #endif
 
  private:
@@ -22,7 +25,10 @@ class InputManager : public Manager {
   bool is_right_;
 
 #ifndef NDEBUG
-  bool is_e_;
+  bool is_e_pressed_;
+  bool is_mouse_clicked_;
+  int mouse_position_x_;
+  int mouse_position_y_;
 #endif
 };
 
