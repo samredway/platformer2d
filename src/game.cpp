@@ -2,8 +2,13 @@
 #include "game.h"
 #include "macros.h"
 #include "raylib.h"
-#include "scenes/level_editor.h"
 #include "scenes/level_scene.h"
+
+// Level editor should only be in non Release builds keep the binary
+// smaller buy not compiling it in
+#ifndef NDEBUG
+#include "scenes/level_editor.h"
+#endif
 
 namespace platformer2d {
 
