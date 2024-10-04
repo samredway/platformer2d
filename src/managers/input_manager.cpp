@@ -41,6 +41,7 @@ bool InputManager::isLeft() const { return is_left_; }
 
 bool InputManager::isSpace() const { return is_space_; }
 
+// Level Editor stuff DEBUG build only
 #ifndef NDEBUG
 bool InputManager::isEPressed() const { return is_e_pressed_; }
 
