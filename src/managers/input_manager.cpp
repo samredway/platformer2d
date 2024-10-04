@@ -1,5 +1,5 @@
-#include "macros.h"
 #include "managers/input_manager.h"
+
 #include "raylib.h"
 
 namespace platformer2d {
@@ -21,8 +21,8 @@ void InputManager::getInput() {
   is_left_ = IsKeyDown(KEY_LEFT);
   is_space_ = IsKeyDown(KEY_SPACE);
 
+// Level Editor stuff DEBUG build only
 #ifndef NDEBUG
-  // Level Editor stuff DEBUG build only
   is_e_pressed_ = IsKeyPressed(KEY_E) ? true : false;
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -44,10 +44,7 @@ bool InputManager::isSpace() const { return is_space_; }
 #ifndef NDEBUG
 bool InputManager::isEPressed() const { return is_e_pressed_; }
 
-bool InputManager::mouseClicked() const {
-  DLOG("Get mouse clicked = " << (is_mouse_clicked_ ? "true" : "false"));
-  return is_mouse_clicked_;
-}
+bool InputManager::mouseClicked() const { return is_mouse_clicked_; }
 
 int InputManager::getMousePositionX() const { return mouse_position_x_; }
 

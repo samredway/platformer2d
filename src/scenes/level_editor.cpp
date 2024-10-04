@@ -9,7 +9,7 @@
 
 namespace platformer2d {
 
-// Forwatd declare free helpers
+// Forward declare free helpers
 void drawGrid();
 
 LevelEditor::LevelEditor(AssetManager& asset_manager,
