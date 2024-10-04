@@ -2,7 +2,6 @@
 
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
-#include "raylib.h"
 #include "scenes/scene.h"
 #include "tile_map.h"
 
@@ -25,6 +24,7 @@ class LevelEditor : public Scene {
   // Private methods
   void handleInput() override;
   void drawGrid() const;
+  void drawTileMap() const;
 };
 
 }  // namespace platformer2d

@@ -10,7 +10,8 @@ InputManager::InputManager()
       is_right_(false)
 #ifndef NDEBUG
       ,
-      is_e_pressed_(false)
+      is_e_pressed_(false),
+      is_mouse_clicked_(false)
 #endif
 {
 }
@@ -24,9 +25,7 @@ void InputManager::getInput() {
   // Level Editor stuff DEBUG build only
   is_e_pressed_ = IsKeyPressed(KEY_E) ? true : false;
 
-  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) ||
-      IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-    DLOG("Mouse clicked");
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     is_mouse_clicked_ = true;
     mouse_position_x_ = GetMouseX();
     mouse_position_y_ = GetMouseY();
@@ -45,7 +44,10 @@ bool InputManager::isSpace() const { return is_space_; }
 #ifndef NDEBUG
 bool InputManager::isEPressed() const { return is_e_pressed_; }
 
-bool InputManager::mouseClicked() const { return is_mouse_clicked_; }
+bool InputManager::mouseClicked() const {
+  DLOG("Get mouse clicked = " << (is_mouse_clicked_ ? "true" : "false"));
+  return is_mouse_clicked_;
+}
 
 int InputManager::getMousePositionX() const { return mouse_position_x_; }
 

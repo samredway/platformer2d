@@ -2,24 +2,32 @@
 
 #include <array>
 #include <cstddef>
+#include <string>
 
-#include "components/render_component.h"
 #include "constants.h"
 
 namespace platformer2d {
 
+struct Tile {
+  int x;
+  int y;
+  std::string texture_name;
+};
+
+constexpr size_t kNumTilesX = (size_t)(kScreenWidth / kTileSize);
+constexpr size_t kNumTilesY = (size_t)(kScreenHeight / kTileSize);
+
+typedef std::array<std::array<Tile, kNumTilesX>, kNumTilesY> TilesArray;
+
 class TileMap {
  public:
-  TileMap();
-  // TODO handle error if tile out of bounds?
+  TileMap() = default;
   void addTile(int tile_count_x, int tile_count_y);
   void removeTile();
-  void draw() const;
+  const TilesArray& getTiles() const;
 
  private:
-  std::array<std::array<RenderComponent, (size_t)(kScreenWidth / kTileSize)>,
-             (size_t)(kScreenHeight / kTileSize)>
-      tiles_;
+  TilesArray tiles_;
 };
 
 }  // namespace platformer2d

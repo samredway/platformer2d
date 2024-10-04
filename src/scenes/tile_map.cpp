@@ -1,6 +1,6 @@
-#include "components/render_component.h"
-#include "macros.h"
 #include "scenes/tile_map.h"
+
+#include "macros.h"
 
 namespace platformer2d {
 
@@ -13,24 +13,18 @@ namespace platformer2d {
  *
  */
 
-TileMap::TileMap() {
-  // Initialize all tiles with empty RenderComponents
-  for (auto& row : tiles_) {
-    for (auto& tile : row) {
-      tile = RenderComponent{};  // Default constructor creates an empty
-                                 // RenderComponent
-    }
-  }
-}
+const TilesArray& TileMap::getTiles() const { return tiles_; }
 
 void TileMap::addTile(int tile_count_x, int tile_count_y) {
   DLOG("Adding tile with tile_count_x " << tile_count_x << " and tile_count_y "
                                         << tile_count_y);
+  const float x_pos = tile_count_x * kTileSize;
+  const float y_pos = tile_count_y * kTileSize;
   tiles_[tile_count_y][tile_count_x].texture_name = "winter_ground_1";
+  tiles_[tile_count_y][tile_count_x].x = x_pos;
+  tiles_[tile_count_y][tile_count_x].y = y_pos;
 }
 
 void TileMap::removeTile() {}
-
-void TileMap::draw() const {}
 
 }  // namespace platformer2d
