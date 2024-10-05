@@ -1,3 +1,5 @@
+#include "scenes/level_scene.h"
+
 #include <format>
 #include <string>
 
@@ -5,7 +7,6 @@
 #include "components/movement_component.h"
 #include "constants.h"
 #include "raylib.h"
-#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -90,6 +91,13 @@ void LevelScene::update() {
 
 void LevelScene::draw() const {
   ClearBackground(background_color_);
+
+#ifndef NDEBUG
+  // Draw some debug info
+  DrawText("Running in debug mode, press 'E' to toggle editor", 10, 10, 15,
+           BLACK);
+  DrawText(TextFormat("FPS: %i", GetFPS()), 10, 25, 10, BLACK);
+#endif
 
   // Draw static components (Tiles)
   render_system_.draw();
