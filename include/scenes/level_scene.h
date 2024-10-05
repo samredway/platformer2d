@@ -20,8 +20,7 @@ namespace platformer2d {
 
 class LevelScene : public Scene {
  public:
-  LevelScene(AssetManager& asset_manager, InputManager& input_manager,
-             const float width, const float height);
+  LevelScene(AssetManager& asset_manager, InputManager& input_manager);
   void draw() const override;
   void update() override;
   void init() override;
@@ -30,9 +29,6 @@ class LevelScene : public Scene {
   void handleInput() override;
   void processRendering() const;
   void initPlayer();
-
-  const float width_;
-  const float height_;
 
   // Owned systems
   PhysicsSystem physics_;

@@ -1,11 +1,10 @@
-#include "constants.h"
 #include "game.h"
 #include "raylib.h"
 
 using namespace platformer2d;
 
 int main() {
-  Game game{kScreenWidth, kScreenHeight};
+  Game game{};
 
   while (!WindowShouldClose()) {
     game.update();

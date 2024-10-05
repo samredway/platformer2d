@@ -6,7 +6,7 @@ namespace platformer2d {
 
 class Game {
  public:
-  Game(int width, int height);
+  Game();
   ~Game();
 
   // Deltete copy consturctors
@@ -22,8 +22,6 @@ class Game {
   void draw() const;
 
  private:
-  const int screen_width_;
-  const int screen_height_;
   InputManager input_manager_;
   AssetManager asset_manager_;
   std::unordered_map<std::string, std::unique_ptr<Scene>> scenes_;

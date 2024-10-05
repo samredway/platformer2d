@@ -8,5 +8,6 @@ constexpr float kGravity{9.8f};
 constexpr int kScreenWidth{800};
 constexpr int kScreenHeight{450};
 constexpr float kTileSize{50.0f};
+constexpr int kTilePickerWidth{200};
 
 }  // namespace platformer2d

@@ -1,11 +1,11 @@
 #include "scenes/level_editor.h"
 
 #include "constants.h"
+#include "level_editor/tile_map.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "raylib.h"
 #include "scenes/scene.h"
-#include "scenes/tile_map.h"
 
 namespace platformer2d {
 
@@ -13,11 +13,8 @@ namespace platformer2d {
 void drawGrid();
 
 LevelEditor::LevelEditor(AssetManager& asset_manager,
-                         InputManager& input_manager, float width, float height)
-    : Scene("editor", SKYBLUE, asset_manager, input_manager),
-      width_(width),
-      height_(height),
-      tile_map_{} {}
+                         InputManager& input_manager)
+    : Scene("editor", SKYBLUE, asset_manager, input_manager), tile_map_{} {}
 
 void LevelEditor::init() {
   // Load in all the Tile textures
@@ -65,15 +62,15 @@ void LevelEditor::update() {
 void LevelEditor::handleInput() {
   // Handle input for the level editor
   if (input_manager_.mouseClicked()) {
-    int tile_count_x = (input_manager_.getMousePositionX() / kTileSize);
-    int tile_count_y = (input_manager_.getMousePositionY() / kTileSize);
+    const int tile_count_x = (input_manager_.getMousePositionX() / kTileSize);
+    const int tile_count_y = (input_manager_.getMousePositionY() / kTileSize);
     tile_map_.addTile(tile_count_x, tile_count_y);
   }
 }
 
 void LevelEditor::draw() const {
   ClearBackground(background_color_);
-  DrawText("Level Editor", 10, 10, 20, BLACK);
+  DrawText("Level Editor", 10, 10, 15, BLACK);
 
   // Draw the tile map as a grid
   drawGrid();
@@ -95,12 +92,12 @@ void LevelEditor::drawTileMap() const {
 }
 
 // Free helper Methods
-void LevelEditor::drawGrid() const {
-  for (int x = 0; x < width_; x += kTileSize) {
-    DrawLine(x, 0, x, height_, BLACK);
+void drawGrid() {
+  for (int x = 0; x < kScreenWidth; x += kTileSize) {
+    DrawLine(x, 0, x, kScreenHeight, BLACK);
   }
-  for (int y = 0; y < height_; y += kTileSize) {
-    DrawLine(0, y, width_, y, BLACK);
+  for (int y = 0; y < kScreenHeight; y += kTileSize) {
+    DrawLine(0, y, kScreenWidth, y, BLACK);
   }
 }
 

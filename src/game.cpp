@@ -13,29 +13,27 @@
 
 namespace platformer2d {
 
-Game::Game(int width, int height)
-    : screen_width_(width),
-      screen_height_(height),
-      input_manager_(),
-      asset_manager_(),
-      scenes_() {
+// Forward declare free helper function
+void initWindow();
+void resizeWindow(const int width, const int height);
+
+Game::Game() : input_manager_(), asset_manager_(), scenes_() {
   // Setup Window
-  InitWindow(screen_width_, screen_height_, "2D Platform Game");
-  SetTargetFPS(kTargetFPS);
+  initWindow();
 
   // Currently we load the asset manager with all textures in a lazy fashion
   // as they are needed. However all textures are held in RAM all the time
   // if this becomes a problem we may need to let each scene load and destruct
   // its own textures so as only to hold the textures in RAM that are required
   // in the given scene
-  scenes_["level"] = std::make_unique<LevelScene>(
-      asset_manager_, input_manager_, width, height);
+  scenes_["level"] =
+      std::make_unique<LevelScene>(asset_manager_, input_manager_);
   scenes_["level"]->init();
   current_scene_ = scenes_["level"].get();
 
 #ifndef NDEBUG
-  scenes_["editor"] = std::make_unique<LevelEditor>(
-      asset_manager_, input_manager_, width, height);
+  scenes_["editor"] =
+      std::make_unique<LevelEditor>(asset_manager_, input_manager_);
   scenes_["editor"]->init();
 #endif
 }
@@ -49,8 +47,11 @@ void Game::update() {
   if (input_manager_.isEPressed()) {
     if (current_scene_->name() == "level") {
       setCurrentScene("editor");
+      // Add width of tile picker to screen width
+      resizeWindow(kScreenWidth + kTilePickerWidth, kScreenHeight);
     } else {
       setCurrentScene("level");
+      resizeWindow(kScreenWidth, kScreenHeight);
     }
   }
 #endif
@@ -70,6 +71,15 @@ void Game::setCurrentScene(const std::string& scene_name) {
   } else {
     PANIC("Scene not found");
   }
+}
+
+void initWindow() {
+  InitWindow(kScreenWidth, kScreenHeight, "2D Platform Game");
+  SetTargetFPS(kTargetFPS);
+}
+
+void resizeWindow(const int width, const int height) {
+  SetWindowSize(width, height);
 }
 
 }  // namespace platformer2d
