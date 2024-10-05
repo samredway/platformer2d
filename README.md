@@ -1,14 +1,27 @@
 # Platformer 2D
 
+This is a work in progress. Having fun doing some hobby game programming in C++ with Raylib as a graphics library.
+
+I have written my own 'engine' using ECS (Entity Component System) architecture to create:
+
+- physics system with gavity, acceletation, velocity and position
+- basic collision detection using AABB
+- texture and tilemap rendering
+- input handling
+- animation system
+- tilemap editor / level design tool (in progress)
+
+This is a toy project to learn about game programming patterns and design principles and to have fun brushing up on modern C++ best practices and approaches and gain familiarity with the C++20 standard.
+
 ## Dependencies
 
 I use `bear` and `make` as a build tool. Installable on Mac as `brew install bear` see build below for usage.
 
-This approach works for me on MacOs and I suspect it will work on Linux. I have not tried it on Windows.
+This approach works for me on MacOs, I have not tried it on other platforms.
 
 The project depends on:
 
-- Raylib: this can be brew installed, or build from scratch see the [docs](https://www.raylib.com/), but I have build the assets separately and included in the lib folder, which are for MacOs. If you are using a different OS you will need to build or install it yourself.
+- Raylib: this can be brew installed, or build from scratch see the [docs](https://www.raylib.com/), but I have build the assets separately and included in the lib folder (for MacOs). If you are using a different OS you will need to build or install it yourself and swap out the lib files.
 
 ## Build
 
@@ -45,4 +58,4 @@ The main folders are as follows:
 - include contains the .h files for the project
 - src contains the cpp files
 - lib is for 3rd party libs and currently contains the raylib files
-
+- assets is for art assets
