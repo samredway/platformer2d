@@ -8,7 +8,12 @@ TilePicker::TilePicker(AssetManager& asset_manager)
     : asset_manager_{asset_manager} {}
 
 void TilePicker::draw() const {
-  // TODO draw each textur in the asset manger to a grid in the tile picker
+  // TODO draw a border for the tile picker
+  // border should have space at the top for a title
+  // And space at the bottom for left and right arrow buttons
+  // which will allow us to scroll through the textures
+
+  // TODO draw each texture in the asset manger to a grid in the tile picker
   // Tile picker will proably have to be scrollable so that it can show all
   // textures
   for (const auto& pair : asset_manager_.getTextures()) {

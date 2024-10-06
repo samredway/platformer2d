@@ -89,6 +89,9 @@ void LevelEditor::draw() const {
 
   // Draw in the placed tiles
   drawTileMap();
+
+  // Draw the tile picker
+  tile_picker_.draw();
 }
 
 void LevelEditor::drawTileMap() const {
@@ -105,7 +108,7 @@ void LevelEditor::drawTileMap() const {
 
 // Free helper Methods
 void drawGrid() {
-  for (int x = 0; x < kScreenWidth + 1; x += kTileSize) {
+  for (int x = 0; x < kScreenWidth; x += kTileSize) {
     DrawLine(x, 0, x, kScreenHeight, BLACK);
   }
   for (int y = 0; y < kScreenHeight; y += kTileSize) {
