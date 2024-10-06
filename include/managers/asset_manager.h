@@ -9,21 +9,24 @@
 
 namespace platformer2d {
 
+typedef std::unordered_map<std::string, Texture2D> TextureMap;
+
 class AssetManager : public Manager {
  public:
   AssetManager();
   ~AssetManager();
+
+  // Should be a singleton effectively so remving copy and move constructors
+  AssetManager(const AssetManager&) = delete;
+  AssetManager& operator=(const AssetManager&) = delete;
+  AssetManager(AssetManager&&) = delete;
+  AssetManager& operator=(AssetManager&&) = delete;
+
   void loadTexture(const std::string& name, const std::string& filename);
   void loadTexture(const std::string& name, const std::string& filename,
                    int width, int height);
 
-#ifndef NDEBUG
-  void debugLogTextures() const {
-    for (auto& pair : textures_) {
-      DLOG(pair.first);
-    }
-  }
-#endif
+  const TextureMap& getTextures() const { return textures_; }
 
   const Texture2D& getTexture(const std::string& name) const;
 

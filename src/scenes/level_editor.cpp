@@ -14,7 +14,9 @@ void drawGrid();
 
 LevelEditor::LevelEditor(AssetManager& asset_manager,
                          InputManager& input_manager)
-    : Scene("editor", SKYBLUE, asset_manager, input_manager), tile_map_{} {}
+    : Scene("editor", SKYBLUE, asset_manager, input_manager),
+      tile_map_{},
+      tile_picker_{asset_manager} {}
 
 void LevelEditor::init() {
   // Load in all the Tile textures
@@ -62,9 +64,19 @@ void LevelEditor::update() {
 void LevelEditor::handleInput() {
   // Handle input for the level editor
   if (input_manager_.mouseClicked()) {
-    const int tile_count_x = (input_manager_.getMousePositionX() / kTileSize);
-    const int tile_count_y = (input_manager_.getMousePositionY() / kTileSize);
-    tile_map_.addTile(tile_count_x, tile_count_y);
+    const size_t tile_count_x =
+        (input_manager_.getMousePositionX() / kTileSize);
+    const size_t tile_count_y =
+        (input_manager_.getMousePositionY() / kTileSize);
+    // Check if the tile is on the tile editor grid
+    if (tile_count_x < tile_map_.getTiles().size() &&
+        tile_count_y < tile_map_.getTiles()[0].size()) {
+      tile_map_.addTile(tile_count_x, tile_count_y,
+                        tile_picker_.getCurrentTextureName());
+    } else {
+      tile_picker_.setCurrentTextureName(input_manager_.getMousePositionX(),
+                                         input_manager_.getMousePositionY());
+    }
   }
 }
 
@@ -93,7 +105,7 @@ void LevelEditor::drawTileMap() const {
 
 // Free helper Methods
 void drawGrid() {
-  for (int x = 0; x < kScreenWidth; x += kTileSize) {
+  for (int x = 0; x < kScreenWidth + 1; x += kTileSize) {
     DrawLine(x, 0, x, kScreenHeight, BLACK);
   }
   for (int y = 0; y < kScreenHeight; y += kTileSize) {

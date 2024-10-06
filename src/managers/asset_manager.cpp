@@ -1,5 +1,3 @@
-#include <optional>
-
 #include "macros.h"
 #include "managers/asset_manager.h"
 

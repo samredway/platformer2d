@@ -1,6 +1,7 @@
 #pragma once
 
 #include "level_editor/tile_map.h"
+#include "level_editor/tile_picker.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "scenes/scene.h"
@@ -17,6 +18,7 @@ class LevelEditor : public Scene {
 
  private:
   TileMap tile_map_;
+  TilePicker tile_picker_;
 
   // Private methods
   void handleInput() override;

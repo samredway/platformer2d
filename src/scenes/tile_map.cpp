@@ -15,12 +15,11 @@ namespace platformer2d {
 
 const TilesArray& TileMap::getTiles() const { return tiles_; }
 
-void TileMap::addTile(int tile_count_x, int tile_count_y) {
-  DLOG("Adding tile with tile_count_x " << tile_count_x << " and tile_count_y "
-                                        << tile_count_y);
+void TileMap::addTile(int tile_count_x, int tile_count_y,
+                      std::string texture_name) {
   const float x_pos = tile_count_x * kTileSize;
   const float y_pos = tile_count_y * kTileSize;
-  tiles_[tile_count_y][tile_count_x].texture_name = "winter_ground_1";
+  tiles_[tile_count_y][tile_count_x].texture_name = texture_name;
   tiles_[tile_count_y][tile_count_x].x = x_pos;
   tiles_[tile_count_y][tile_count_x].y = y_pos;
 }
