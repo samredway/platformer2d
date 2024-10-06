@@ -69,8 +69,8 @@ void LevelEditor::handleInput() {
     const size_t tile_count_y =
         (input_manager_.getMousePositionY() / kTileSize);
     // Check if the tile is on the tile editor grid
-    if (tile_count_x < tile_map_.getTiles().size() &&
-        tile_count_y < tile_map_.getTiles()[0].size()) {
+    if (tile_count_x < tile_map_.getTiles()[0].size() &&
+        tile_count_y < tile_map_.getTiles().size()) {
       tile_map_.addTile(tile_count_x, tile_count_y,
                         tile_picker_.getCurrentTextureName());
     } else {

@@ -1,5 +1,7 @@
 #include "level_editor/tile_picker.h"
 
+#include "macros.h"
+
 namespace platformer2d {
 
 TilePicker::TilePicker(AssetManager& asset_manager)

@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "macros.h"
 #include "managers/manager.h"
 #include "raylib.h"
 
