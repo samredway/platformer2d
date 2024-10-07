@@ -1,18 +1,31 @@
+#include "constants.h"
 #include "level_editor/tile_picker.h"
-
 #include "macros.h"
+#include "raylib.h"
 
 namespace platformer2d {
 
 TilePicker::TilePicker(AssetManager& asset_manager)
     : asset_manager_{asset_manager} {}
 
-void TilePicker::draw() const {
-  // TODO draw a border for the tile picker
-  // border should have space at the top for a title
-  // And space at the bottom for left and right arrow buttons
-  // which will allow us to scroll through the textures
+constexpr float top_border_y{kTileSize};
+constexpr float bottom_border_y{kScreenHeight - kTileSize};
+constexpr float left_border_x{kScreenWidth};
+constexpr float right_border_x{kScreenWidth + kTilePickerWidth};
 
+void TilePicker::draw() const {
+  // Draw title
+  DrawText("Tile Picker", (int)left_border_x + 10, (int)top_border_y - 30, 15,
+           BLACK);
+  // Borders for the tile picker
+  DrawLineEx(Vector2{left_border_x, top_border_y},
+             Vector2{right_border_x, top_border_y}, 2, BLACK);
+  DrawLineEx(Vector2{left_border_x, bottom_border_y},
+             Vector2{right_border_x, bottom_border_y}, 2, BLACK);
+  DrawLineEx(Vector2{left_border_x, kScreenHeight}, Vector2{left_border_x, 0},
+             2, BLACK);
+  DrawLineEx(Vector2{right_border_x - 1, kScreenHeight},
+             Vector2{right_border_x - 1, 0}, 2, BLACK);
   // TODO draw each texture in the asset manger to a grid in the tile picker
   // Tile picker will proably have to be scrollable so that it can show all
   // textures

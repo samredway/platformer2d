@@ -1,5 +1,3 @@
-#include "scenes/level_scene.h"
-
 #include <format>
 #include <string>
 
@@ -7,6 +5,7 @@
 #include "components/movement_component.h"
 #include "constants.h"
 #include "raylib.h"
+#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -93,8 +92,7 @@ void LevelScene::draw() const {
 
 #ifndef NDEBUG
   // Draw some debug info
-  DrawText("Running in debug mode, press E to toggle editor", 10, 10, 15,
-           BLACK);
+  DrawText("DEBUG mode press E to toggle editor", 10, 10, 15, BLACK);
 #endif
 
   // Draw static components (Tiles)
