@@ -1,4 +1,3 @@
-#include "constants.h"
 #include "level_editor/tile_picker.h"
 #include "macros.h"
 #include "raylib.h"
@@ -6,12 +5,33 @@
 namespace platformer2d {
 
 TilePicker::TilePicker(AssetManager& asset_manager)
-    : asset_manager_{asset_manager} {}
+    : asset_manager_{asset_manager} {
+  auto texture_it = asset_manager_.getTextures().begin();
+  auto texture_end = asset_manager_.getTextures().end();
 
-constexpr float top_border_y{kTileSize};
-constexpr float bottom_border_y{kScreenHeight - kTileSize};
-constexpr float left_border_x{kScreenWidth};
-constexpr float right_border_x{kScreenWidth + kTilePickerWidth};
+  DLOG("Starting Tile Picker Constructor");
+
+  while (texture_it != texture_end) {
+    DLOG("Texuture id: " << texture_it->first);
+    ++texture_it;
+  }
+
+  // bool should_break = false;
+  // for (size_t i = 0; i < tile_map_.size() && !should_break; ++i) {
+  //   for (size_t j = 0; j < tile_map_[i].size() && !should_break; ++j) {
+  //     if (texture_it == texture_end) {
+  //       DLOG("Texture iterator out of range");
+  //       should_break = true;
+  //       break;
+  //     }
+  //     tile_map_[i][j] = texture_it->first;
+  //     ++texture_it;
+
+  //     DLOG(tile_map_[i][j] << " written in tile picker tile map at loc " << i
+  //                          << " " << j);
+  //   }
+  // }
+}
 
 void TilePicker::draw() const {
   // Draw title
@@ -29,6 +49,7 @@ void TilePicker::draw() const {
   // TODO draw each texture in the asset manger to a grid in the tile picker
   // Tile picker will proably have to be scrollable so that it can show all
   // textures
+
   for (const auto& pair : asset_manager_.getTextures()) {
     DLOG(pair.first);
   }
