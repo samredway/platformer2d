@@ -1,27 +1,35 @@
 #pragma once
 
-#include <array>
 #include <cstddef>
+#include <vector>
 
-#include "constants.h"
 #include "level_editor/tile.h"
 
 namespace platformer2d {
 
-constexpr size_t kNumTilesX = (size_t)(kScreenWidth / kTileSize);
-constexpr size_t kNumTilesY = (size_t)(kScreenHeight / kTileSize);
+typedef std::vector<std::vector<Tile>> TilesVec;
 
-typedef std::array<std::array<Tile, kNumTilesX>, kNumTilesY> TilesArray;
-
+/**
+ *  Internal model of the tile map is an vector of vectors
+ *  [
+ *    [ max_tiles_x  ],
+ *    ..., size max_tiles_y
+ *  ]
+ *
+ */
 class TileMap {
  public:
-  TileMap() = default;
-  void addTile(int tile_count_x, int tile_count_y, std::string texture_name);
+  TileMap(size_t max_tiles_x, size_t max_tiles_y);
+  // Return false in case of out of bounds
+  bool addTile(size_t tile_count_x, size_t tile_count_y,
+               std::string texture_name);
   void removeTile();
-  const TilesArray& getTiles() const;
+  const TilesVec& getTiles() const;
 
  private:
-  TilesArray tiles_;
+  size_t max_tiles_x_;
+  size_t max_tiles_y_;
+  TilesVec tiles_;
 };
 
 }  // namespace platformer2d

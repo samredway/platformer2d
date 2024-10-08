@@ -1,11 +1,22 @@
+#include "constants.h"
 #include "level_editor/tile_picker.h"
 #include "macros.h"
 #include "raylib.h"
 
 namespace platformer2d {
 
+constexpr size_t kPickerNumTilesX = kTilePickerWidth / kTileSize;
+constexpr size_t kPickerNumTilesY =
+    (kScreenHeight - (2 * kTileSize)) / kTileSize;
+
 TilePicker::TilePicker(AssetManager& asset_manager)
-    : asset_manager_{asset_manager} {}
+    : asset_manager_{asset_manager},
+      tile_map_{kPickerNumTilesX, kPickerNumTilesY} {}
+
+void TilePicker::init() {
+  // TODO loop through assets and write each tile to the tilemap
+  // For now we will ignore sprites
+}
 
 void TilePicker::draw() const {
   // Draw title

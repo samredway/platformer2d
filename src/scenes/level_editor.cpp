@@ -1,21 +1,24 @@
-#include "scenes/level_editor.h"
-
 #include "constants.h"
 #include "level_editor/tile_map.h"
+#include "macros.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "raylib.h"
+#include "scenes/level_editor.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
 
+constexpr size_t kNumTilesX = (size_t)(kScreenWidth / kTileSize);
+constexpr size_t kNumTilesY = (size_t)(kScreenHeight / kTileSize);
+//
 // Forward declare free helpers
 void drawGrid();
 
 LevelEditor::LevelEditor(AssetManager& asset_manager,
                          InputManager& input_manager)
     : Scene("editor", SKYBLUE, asset_manager, input_manager),
-      tile_map_{},
+      tile_map_{kNumTilesX, kNumTilesY},
       tile_picker_{asset_manager} {}
 
 void LevelEditor::init() {
@@ -71,8 +74,12 @@ void LevelEditor::handleInput() {
     // Check if the tile is on the tile editor grid
     if (tile_count_x < tile_map_.getTiles()[0].size() &&
         tile_count_y < tile_map_.getTiles().size()) {
-      tile_map_.addTile(tile_count_x, tile_count_y,
-                        tile_picker_.getCurrentTextureName());
+      bool added = tile_map_.addTile(tile_count_x, tile_count_y,
+                                     tile_picker_.getCurrentTextureName());
+      if (!added) {
+        PANIC("Tile at " << tile_count_x << ", " << tile_count_y
+                         << " is out of bounds");
+      }
     } else {
       tile_picker_.setCurrentTextureName(input_manager_.getMousePositionX(),
                                          input_manager_.getMousePositionY());
