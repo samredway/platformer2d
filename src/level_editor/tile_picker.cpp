@@ -5,33 +5,7 @@
 namespace platformer2d {
 
 TilePicker::TilePicker(AssetManager& asset_manager)
-    : asset_manager_{asset_manager} {
-  auto texture_it = asset_manager_.getTextures().begin();
-  auto texture_end = asset_manager_.getTextures().end();
-
-  DLOG("Starting Tile Picker Constructor");
-
-  while (texture_it != texture_end) {
-    DLOG("Texuture id: " << texture_it->first);
-    ++texture_it;
-  }
-
-  // bool should_break = false;
-  // for (size_t i = 0; i < tile_map_.size() && !should_break; ++i) {
-  //   for (size_t j = 0; j < tile_map_[i].size() && !should_break; ++j) {
-  //     if (texture_it == texture_end) {
-  //       DLOG("Texture iterator out of range");
-  //       should_break = true;
-  //       break;
-  //     }
-  //     tile_map_[i][j] = texture_it->first;
-  //     ++texture_it;
-
-  //     DLOG(tile_map_[i][j] << " written in tile picker tile map at loc " << i
-  //                          << " " << j);
-  //   }
-  // }
-}
+    : asset_manager_{asset_manager} {}
 
 void TilePicker::draw() const {
   // Draw title

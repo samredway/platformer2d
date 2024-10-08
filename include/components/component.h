@@ -22,6 +22,8 @@ ComponentT& getComponentOrPanic(
 }
 
 struct Component {
+  Component(std::string tag) : entity_tag(tag) {}
+
   std::string entity_tag;
 };
 
