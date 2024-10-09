@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "level_editor/tile.h"
+#include "managers/asset_manager.h"
 
 namespace platformer2d {
 
@@ -19,17 +20,23 @@ typedef std::vector<std::vector<Tile>> TilesVec;
  */
 class TileMap {
  public:
-  TileMap(size_t max_tiles_x, size_t max_tiles_y);
+  TileMap(size_t max_tiles_x, size_t max_tiles_y, AssetManager& asset_manager);
   // Return false in case of out of bounds
-  bool addTile(size_t tile_count_x, size_t tile_count_y,
-               std::string texture_name);
+  bool addTile(size_t tile_count_x, size_t tile_count_y, float pos_x,
+               float pos_y, std::string texture_name);
   void removeTile();
   const TilesVec& getTiles() const;
+  void draw() const;
+
+  size_t getMaxTilesX() { return max_tiles_x_; }
+
+  size_t getMaxTilesY() { return max_tiles_y_; }
 
  private:
   size_t max_tiles_x_;
   size_t max_tiles_y_;
   TilesVec tiles_;
+  AssetManager& asset_manager_;
 };
 
 }  // namespace platformer2d

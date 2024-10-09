@@ -18,7 +18,7 @@ void drawGrid();
 LevelEditor::LevelEditor(AssetManager& asset_manager,
                          InputManager& input_manager)
     : Scene("editor", SKYBLUE, asset_manager, input_manager),
-      tile_map_{kNumTilesX, kNumTilesY},
+      tile_map_{kNumTilesX, kNumTilesY, asset_manager},
       tile_picker_{asset_manager} {}
 
 void LevelEditor::init() {
@@ -57,6 +57,8 @@ void LevelEditor::init() {
 
   // TODO load in character sprites and select single animation frame
   // to place them
+
+  tile_picker_.init();
 }
 
 void LevelEditor::update() {
@@ -74,7 +76,9 @@ void LevelEditor::handleInput() {
     // Check if the tile is on the tile editor grid
     if (tile_count_x < tile_map_.getTiles()[0].size() &&
         tile_count_y < tile_map_.getTiles().size()) {
-      bool added = tile_map_.addTile(tile_count_x, tile_count_y,
+      const float pos_x = tile_count_x * kTileSize;
+      const float pos_y = tile_count_y * kTileSize;
+      bool added = tile_map_.addTile(tile_count_x, tile_count_y, pos_x, pos_y,
                                      tile_picker_.getCurrentTextureName());
       if (!added) {
         PANIC("Tile at " << tile_count_x << ", " << tile_count_y
@@ -95,22 +99,10 @@ void LevelEditor::draw() const {
   drawGrid();
 
   // Draw in the placed tiles
-  drawTileMap();
+  tile_map_.draw();
 
   // Draw the tile picker
   tile_picker_.draw();
-}
-
-void LevelEditor::drawTileMap() const {
-  // Draw in the placed tiles
-  for (const auto& row : tile_map_.getTiles()) {
-    for (const auto& tile : row) {
-      if (tile.texture_name != "") {
-        DrawTexture(asset_manager_.getTexture(tile.texture_name), tile.x,
-                    tile.y, WHITE);
-      }
-    }
-  }
 }
 
 // Free helper Methods

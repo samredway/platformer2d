@@ -11,11 +11,31 @@ constexpr size_t kPickerNumTilesY =
 
 TilePicker::TilePicker(AssetManager& asset_manager)
     : asset_manager_{asset_manager},
-      tile_map_{kPickerNumTilesX, kPickerNumTilesY} {}
+      tile_map_{kPickerNumTilesX, kPickerNumTilesY, asset_manager} {}
 
 void TilePicker::init() {
   // TODO loop through assets and write each tile to the tilemap
   // For now we will ignore sprites
+  size_t count_x = 0;
+  size_t count_y = 0;
+  for (auto& asset_it : asset_manager_.getTextures()) {
+    auto& texture_name = asset_it.first;
+    const float pos_x = (count_x * kTileSize) + right_border_x;
+    const float pos_y = (count_y * kTileSize) + top_border_y;
+
+    // DEBUG log
+    DLOG("Adding tile to map count x " << count_x << " count y " << count_y);
+
+    tile_map_.addTile(count_x, count_y, pos_x, pos_y, texture_name);
+    ++count_x;
+    if (count_x == tile_map_.getMaxTilesX()) {
+      count_x = 0;
+      ++count_y;
+      if (count_y == tile_map_.getMaxTilesY()) {
+        count_y = 0;
+      }
+    }
+  }
 }
 
 void TilePicker::draw() const {
@@ -31,13 +51,8 @@ void TilePicker::draw() const {
              2, BLACK);
   DrawLineEx(Vector2{right_border_x - 1, kScreenHeight},
              Vector2{right_border_x - 1, 0}, 2, BLACK);
-  // TODO draw each texture in the asset manger to a grid in the tile picker
-  // Tile picker will proably have to be scrollable so that it can show all
-  // textures
 
-  for (const auto& pair : asset_manager_.getTextures()) {
-    DLOG(pair.first);
-  }
+  tile_map_.draw();
 }
 
 // TODO
