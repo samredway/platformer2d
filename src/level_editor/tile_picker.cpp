@@ -20,13 +20,20 @@ void TilePicker::init() {
   size_t count_y = 0;
   for (auto& asset_it : asset_manager_.getTextures()) {
     auto& texture_name = asset_it.first;
-    const float pos_x = (count_x * kTileSize) + right_border_x;
+
+    // Only load tiles in right now. Ignore sprites
+    if (!texture_name.starts_with("tile_")) {
+      continue;
+    }
+
+    const float pos_x = (count_x * kTileSize) + left_border_x;
     const float pos_y = (count_y * kTileSize) + top_border_y;
 
-    // DEBUG log
-    DLOG("Adding tile to map count x " << count_x << " count y " << count_y);
-
-    tile_map_.addTile(count_x, count_y, pos_x, pos_y, texture_name);
+    bool added =
+        tile_map_.addTile(count_x, count_y, pos_x, pos_y, texture_name);
+    if (!added) {
+      PANIC("Attempted to place tile out of bounds");
+    }
     ++count_x;
     if (count_x == tile_map_.getMaxTilesX()) {
       count_x = 0;

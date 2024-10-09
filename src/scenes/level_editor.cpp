@@ -23,37 +23,37 @@ LevelEditor::LevelEditor(AssetManager& asset_manager,
 
 void LevelEditor::init() {
   // Load in all the Tile textures
-  asset_manager_.loadTexture("winter_ground_0",
+  asset_manager_.loadTexture("tile_winter_ground_0",
                              "assets/winter_ground/ground0.png");
-  asset_manager_.loadTexture("winter_ground_1",
+  asset_manager_.loadTexture("tile_winter_ground_1",
                              "assets/winter_ground/ground1.png");
-  asset_manager_.loadTexture("winter_ground_2",
+  asset_manager_.loadTexture("tile_winter_ground_2",
                              "assets/winter_ground/ground2.png");
-  asset_manager_.loadTexture("winter_ground_3",
+  asset_manager_.loadTexture("tile_winter_ground_3",
                              "assets/winter_ground/ground3.png");
-  asset_manager_.loadTexture("winter_ground_4",
+  asset_manager_.loadTexture("tile_winter_ground_4",
                              "assets/winter_ground/ground4.png");
-  asset_manager_.loadTexture("winter_ground_5",
+  asset_manager_.loadTexture("tile_winter_ground_5",
                              "assets/winter_ground/ground5.png");
-  asset_manager_.loadTexture("winter_ground_6",
+  asset_manager_.loadTexture("tile_winter_ground_6",
                              "assets/winter_ground/ground6.png");
-  asset_manager_.loadTexture("winter_ground_7",
+  asset_manager_.loadTexture("tile_winter_ground_7",
                              "assets/winter_ground/ground7.png");
-  asset_manager_.loadTexture("winter_ground_8",
+  asset_manager_.loadTexture("tile_winter_ground_8",
                              "assets/winter_ground/ground8.png");
-  asset_manager_.loadTexture("winter_ground_9",
+  asset_manager_.loadTexture("tile_winter_ground_9",
                              "assets/winter_ground/ground9.png");
-  asset_manager_.loadTexture("winter_groundIce1",
+  asset_manager_.loadTexture("tile_winter_groundIce1",
                              "assets/winter_ground/groundIce1.png");
-  asset_manager_.loadTexture("winter_groundIce2",
+  asset_manager_.loadTexture("tile_winter_groundIce2",
                              "assets/winter_ground/groundIce2.png");
-  asset_manager_.loadTexture("winter_groundIce3",
+  asset_manager_.loadTexture("tile_winter_groundIce3",
                              "assets/winter_ground/groundIce3.png");
-  asset_manager_.loadTexture("winter_groundl",
+  asset_manager_.loadTexture("tile_winter_groundl",
                              "assets/winter_ground/groundl.png");
-  asset_manager_.loadTexture("winter_groundr",
+  asset_manager_.loadTexture("tile_winter_groundr",
                              "assets/winter_ground/groundr.png");
-  asset_manager_.loadTexture("winter_ice", "assets/winter_ground/ice.png");
+  asset_manager_.loadTexture("tile_winter_ice", "assets/winter_ground/ice.png");
 
   // TODO load in character sprites and select single animation frame
   // to place them
