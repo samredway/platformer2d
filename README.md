@@ -24,25 +24,39 @@ This is a toy project to learn about game programming patterns and design princi
 
 ## Dependencies
 
-I use `bear` and `make` as a build tool. Installable on Mac as `brew install bear` see build below for usage.
+### Raylib
 
-This approach works for me on MacOs, I have not tried it on other platforms.
+The project depends on [Raylib](https://www.raylib.com/), which you can install via Homebrew or build from source (see the [Raylib documentation](https://www.raylib.com/)).
 
-The project depends on:
+For macOS, I’ve pre-built the necessary assets and included them in the `lib/` folder. If you’re using a different OS, you’ll need to build or install Raylib and swap out the library files as appropriate.
 
-- Raylib: this can be brew installed, or build from scratch see the [docs](https://www.raylib.com/), but I have build the assets separately and included in the lib folder (for MacOs). If you are using a different OS you will need to build or install it yourself and swap out the lib files.
+I use a `Makefile` to build the project, so you should have `make` installed.
+
+### Optional: Bear for IDE Support
+
+If you're using an IDE or editor that benefits from `compile_commands.json` (e.g., for code navigation or autocompletion), you can use [Bear](https://github.com/rizsotto/Bear) to generate it. Bear is **optional** and not required to build or run the project.
+
+To install Bear on macOS:
+
+```bash
+brew install bear
+```
 
 ## Build
 
-This project uses Makefile for build instructions and bear to build the compile_commands.json.
+You can build the project just running
 
-To build the compile_commmands.json just run
+```bash
+make
+```
 
-    bear -- make
+If you want to use `bear` to generate a compile_commamnds.json
 
-This will build the project and update the compile_commands.json
+```bash
+bear -- make
+```
 
-You can run the game now with:
+Now you can run the game with:
 
     bin/game
 
@@ -64,7 +78,7 @@ Some key points regarding keeping code simple and making memory management safer
 
 The main folders are as follows:
 
-- include contains the .h files for the project
-- src contains the cpp files
-- lib is for 3rd party libs and currently contains the raylib files
-- assets is for art assets
+- include/ contains the .h files for the project
+- src/ contains the cpp files
+- lib/ is for 3rd party libs and currently contains the raylib files
+- assets/ contains art assets
