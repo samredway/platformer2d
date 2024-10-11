@@ -51,7 +51,9 @@ bool TileMap::removeTile(size_t tile_x, size_t tile_y) {
   if (!isInBounds(tile_x, tile_y)) {
     return false;
   }
-  // TODO remove the tile
+  // TODO remove the tile will need to add method for calling this
+  // perhaps right click to remove. But maybe just having a blank
+  // tile in the selector as a delete will be simpler?
   return true;
 }
 
