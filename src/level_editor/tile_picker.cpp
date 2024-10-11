@@ -11,24 +11,22 @@ constexpr size_t kPickerNumTilesY =
 
 TilePicker::TilePicker(AssetManager& asset_manager)
     : asset_manager_{asset_manager},
+      current_texture_name_("tile_winter_ice"),
       tile_map_{kPickerNumTilesX, kPickerNumTilesY, asset_manager} {}
 
 void TilePicker::init() {
-  // TODO loop through assets and write each tile to the tilemap
+  // Loop through assets and write each tile to the tilemap
   // For now we will ignore sprites
   size_t count_x = 0;
   size_t count_y = 0;
   for (auto& asset_it : asset_manager_.getTextures()) {
     auto& texture_name = asset_it.first;
-
     // Only load tiles in right now. Ignore sprites
     if (!texture_name.starts_with("tile_")) {
       continue;
     }
-
     const float pos_x = (count_x * kTileSize) + left_border_x;
     const float pos_y = (count_y * kTileSize) + top_border_y;
-
     bool added =
         tile_map_.addTile(count_x, count_y, pos_x, pos_y, texture_name);
     if (!added) {
@@ -62,14 +60,21 @@ void TilePicker::draw() const {
   tile_map_.draw();
 }
 
-// TODO
 void TilePicker::setCurrentTextureName(int mouse_x, int mouse_y) {
   DLOG("Mouse x: " << mouse_x << " Mouse y: " << mouse_y);
+  // Find the position in tile map
+  size_t count_x = (mouse_x - left_border_x) / kTileSize;
+  size_t count_y = (mouse_y - top_border_y) / kTileSize;
+  auto tile = tile_map_.getTile(count_x, count_y);
+  if (!tile) {
+    PANIC("Out of bounds error selecting tile");
+  }
+  DLOG("Setting current texture name: " << tile->get().texture_name);
+  current_texture_name_ = tile->get().texture_name;
 }
 
-// TODO
 std::string TilePicker::getCurrentTextureName() const {
-  return "winter_ground_1";
+  return current_texture_name_;
 }
 
 }  // namespace platformer2d

@@ -17,6 +17,7 @@ class TilePicker {
   void draw() const;
   void setCurrentTextureName(int mouse_x, int mouse_y);
   std::string getCurrentTextureName() const;
+  Tile getTile(size_t count_x, size_t count_y);
 
   // Fill the tile map with all tiles and sprites.
   // NOTE this only contains the number of textures that can fit in the

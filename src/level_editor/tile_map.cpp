@@ -1,7 +1,7 @@
+#include <functional>
 #include <vector>
 
 #include "level_editor/tile_map.h"
-#include "macros.h"
 #include "managers/asset_manager.h"
 #include "raylib.h"
 
@@ -16,15 +16,23 @@ TileMap::TileMap(size_t max_tiles_x, size_t max_tiles_y,
 
 const TilesVec& TileMap::getTiles() const { return tiles_; }
 
-bool TileMap::addTile(size_t tile_count_x, size_t tile_count_y, float pos_x,
-                      float pos_y, std::string texture_name) {
-  if (tile_count_x > max_tiles_x_ || tile_count_y > max_tiles_y_) {
+bool TileMap::addTile(size_t tile_x, size_t tile_y, float pos_x, float pos_y,
+                      std::string texture_name) {
+  if (!isInBounds(tile_x, tile_y)) {
     return false;
   }
-  tiles_[tile_count_y][tile_count_x].texture_name = texture_name;
-  tiles_[tile_count_y][tile_count_x].x = pos_x;
-  tiles_[tile_count_y][tile_count_x].y = pos_y;
+  tiles_[tile_y][tile_x].texture_name = texture_name;
+  tiles_[tile_y][tile_x].x = pos_x;
+  tiles_[tile_y][tile_x].y = pos_y;
   return true;
+}
+
+std::optional<std::reference_wrapper<const Tile>> TileMap::getTile(
+    size_t tile_x, size_t tile_y) const {
+  if (!isInBounds(tile_x, tile_y)) {
+    return std::nullopt;
+  }
+  return std::ref(tiles_[tile_y][tile_x]);
 }
 
 void TileMap::draw() const {
@@ -39,6 +47,19 @@ void TileMap::draw() const {
   }
 }
 
-void TileMap::removeTile() {}
+bool TileMap::removeTile(size_t tile_x, size_t tile_y) {
+  if (!isInBounds(tile_x, tile_y)) {
+    return false;
+  }
+  // TODO remove the tile
+  return true;
+}
+
+bool TileMap::isInBounds(size_t tile_x, size_t tile_y) const {
+  if (tile_x > max_tiles_x_ || tile_y > max_tiles_y_) {
+    return false;
+  }
+  return true;
+}
 
 }  // namespace platformer2d

@@ -24,36 +24,52 @@ LevelEditor::LevelEditor(AssetManager& asset_manager,
 void LevelEditor::init() {
   // Load in all the Tile textures
   asset_manager_.loadTexture("tile_winter_ground_0",
-                             "assets/winter_ground/ground0.png");
+                             "assets/winter_ground/ground0.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_1",
-                             "assets/winter_ground/ground1.png");
+                             "assets/winter_ground/ground1.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_2",
-                             "assets/winter_ground/ground2.png");
+                             "assets/winter_ground/ground2.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_3",
-                             "assets/winter_ground/ground3.png");
+                             "assets/winter_ground/ground3.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_4",
-                             "assets/winter_ground/ground4.png");
+                             "assets/winter_ground/ground4.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_5",
-                             "assets/winter_ground/ground5.png");
+                             "assets/winter_ground/ground5.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_6",
-                             "assets/winter_ground/ground6.png");
+                             "assets/winter_ground/ground6.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_7",
-                             "assets/winter_ground/ground7.png");
+                             "assets/winter_ground/ground7.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_8",
-                             "assets/winter_ground/ground8.png");
+                             "assets/winter_ground/ground8.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_ground_9",
-                             "assets/winter_ground/ground9.png");
+                             "assets/winter_ground/ground9.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_groundIce1",
-                             "assets/winter_ground/groundIce1.png");
+                             "assets/winter_ground/groundIce1.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_groundIce2",
-                             "assets/winter_ground/groundIce2.png");
+                             "assets/winter_ground/groundIce2.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_groundIce3",
-                             "assets/winter_ground/groundIce3.png");
+                             "assets/winter_ground/groundIce3.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_groundl",
-                             "assets/winter_ground/groundl.png");
+                             "assets/winter_ground/groundl.png", kTileSize,
+                             kTileSize);
   asset_manager_.loadTexture("tile_winter_groundr",
-                             "assets/winter_ground/groundr.png");
-  asset_manager_.loadTexture("tile_winter_ice", "assets/winter_ground/ice.png");
+                             "assets/winter_ground/groundr.png", kTileSize,
+                             kTileSize);
+  asset_manager_.loadTexture("tile_winter_ice", "assets/winter_ground/ice.png",
+                             kTileSize, kTileSize);
 
   // TODO load in character sprites and select single animation frame
   // to place them

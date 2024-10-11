@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
+#include <optional>
 #include <vector>
 
 #include "level_editor/tile.h"
@@ -22,9 +24,11 @@ class TileMap {
  public:
   TileMap(size_t max_tiles_x, size_t max_tiles_y, AssetManager& asset_manager);
   // Return false in case of out of bounds
-  bool addTile(size_t tile_count_x, size_t tile_count_y, float pos_x,
-               float pos_y, std::string texture_name);
-  void removeTile();
+  bool addTile(size_t tile_x, size_t tile_y, float pos_x, float pos_y,
+               std::string texture_name);
+  std::optional<std::reference_wrapper<const Tile>> getTile(
+      size_t tile_x, size_t tile_y) const;
+  bool removeTile(size_t tile_x, size_t tile_y);
   const TilesVec& getTiles() const;
   void draw() const;
 
@@ -33,6 +37,8 @@ class TileMap {
   size_t getMaxTilesY() { return max_tiles_y_; }
 
  private:
+  bool isInBounds(size_t tile_x, size_t tile_y) const;
+
   size_t max_tiles_x_;
   size_t max_tiles_y_;
   TilesVec tiles_;

@@ -30,6 +30,9 @@ class AssetManager : public Manager {
   const Texture2D& getTexture(const std::string& name) const;
 
  private:
+  bool isTextureLoaded(std::string texture_name) const;
+
+  // private members
   std::unordered_map<std::string, Texture2D> textures_;
 };
 
