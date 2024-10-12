@@ -16,6 +16,9 @@ class LevelEditor : public Scene {
   void update() override;
   void draw() const override;
 
+  // Save current level state to disk
+  void save() const;
+
  private:
   TileMap tile_map_;
   TilePicker tile_picker_;
