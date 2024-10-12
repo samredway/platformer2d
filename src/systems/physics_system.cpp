@@ -151,8 +151,10 @@ void handleCollision(MovementComponent& movement_component,
       movement_component.acceleration_x = 0;
       break;
     case RectangleSide::kBottom:
-      position.y = collision_box_2.y - collision_box_1.height;
+      position.y =
+          collision_box_2.y + collision_box_2.height + kCollisionOffset;
       movement_component.velocity_y = 0;
+      movement_component.acceleration_y = 0;
       break;
   }
 }
