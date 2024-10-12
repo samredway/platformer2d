@@ -53,7 +53,7 @@ Game::Game() : input_manager_(), asset_manager_(), scenes_() {
                                kTileSize);
   }
 
-  // Load in sprites
+  // Load in sprites (different size than tiles)
   asset_manager_.loadTexture("pink_monster_idle",
                              "assets/Pink_Monster_Idle_4.png");
   asset_manager_.loadTexture("pink_monster_run",

@@ -40,13 +40,20 @@ void LevelScene::loadLevelFromFile() {
   DLOG("Loaded level from file:\n" << level_json.dump(2));
 
   // Create components from the json objects
-  for (const auto& tile_row : level_json["tiles"]) {
+  int counter{0};
+  for (const auto& tile_row : level_json["tile_map"]["tiles"]) {
     for (const auto& tile : tile_row) {
+      if (tile["texture_name"] == "") {
+        continue;
+      }
+      ++counter;
+      const std::string tile_tag{"tile_" + std::to_string(counter)};
       render_components_.emplace(
-          tile["texture"], RenderComponent{tile["texture"], tile["texture"]});
+          tile_tag, RenderComponent{tile_tag, tile["texture_name"]});
       position_components_.emplace(
-          tile["texture"],
-          PositionComponent{tile["texture"], tile["x"], tile["y"]});
+          tile_tag, PositionComponent{tile_tag, tile["x"], tile["y"]});
+      collision_components_.emplace(
+          tile_tag, CollisionComponent{tile_tag, kTileSize, kTileSize, 0, 0});
     }
   }
 }
