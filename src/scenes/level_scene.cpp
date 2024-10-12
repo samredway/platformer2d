@@ -1,11 +1,13 @@
-#include <format>
+#include "scenes/level_scene.h"
+
+#include <fstream>
 #include <string>
 
 #include "components/animation_component.h"
 #include "components/movement_component.h"
 #include "constants.h"
+#include "json.hpp"
 #include "raylib.h"
-#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -23,41 +25,37 @@ LevelScene::LevelScene(AssetManager& asset_manager, InputManager& input_manager)
 }
 
 void LevelScene::init() {
-  // Load textures
-  asset_manager_.loadTexture("winter_ground_1",
-                             "assets/winter_ground/ground1.png", 50, 50);
-  asset_manager_.loadTexture("pink_monster_idle",
-                             "assets/Pink_Monster_Idle_4.png");
-  asset_manager_.loadTexture("pink_monster_run",
-                             "assets/Pink_Monster_Run_6.png");
-  asset_manager_.loadTexture("winter_ice", "assets/winter_ground/ice.png", 50,
-                             50);
-
-  // Initialise player components
   initPlayer();
+  loadLevelFromFile();
+}
 
-  // Floor tiles
-  for (int i = 0; i < 8; i++) {
-    const std::string tileTag{std::format("tile{}", i)};
-    const float x{(kScreenWidth / 2.0f) - ((4.0f - i) * kTileSize)};
-    position_components_.emplace(
-        tileTag,
-        PositionComponent{tileTag, x, (float)kScreenHeight - kTileSize});
-    render_components_.emplace(tileTag,
-                               RenderComponent{tileTag, "winter_ground_1"});
-    collision_components_.emplace(
-        tileTag, CollisionComponent{tileTag, kTileSize, kTileSize});
+void LevelScene::loadLevelFromFile() {
+  std::string level_file_path{"assets/levels/level_editor.json"};
+  std::ifstream file{level_file_path};
+  if (!file.is_open()) {
+    DLOG("Failed to open level file! Loading empty level");
+    return;
   }
-
-  // Central tile to do x collision on
-  const std::string tileTag{std::format("tile8")};
-  const float x{(kScreenWidth / 2.0f) - kTileSize / 2};
-  position_components_.emplace(
-      tileTag,
-      PositionComponent{tileTag, x, (float)kScreenHeight - kTileSize * 2});
-  render_components_.emplace(tileTag, RenderComponent{tileTag, "winter_ice"});
-  collision_components_.emplace(
-      tileTag, CollisionComponent{tileTag, kTileSize, kTileSize});
+  DLOG("Loading level from file: " << level_file_path);
+  nlohmann::json level_json;
+  file >> level_json;
+  // Create components from the json objects
+  int counter{0};
+  for (const auto& tile_row : level_json["tile_map"]["tiles"]) {
+    for (const auto& tile : tile_row) {
+      if (tile["texture_name"] == "") {
+        continue;
+      }
+      ++counter;
+      const std::string tile_tag{"tile_" + std::to_string(counter)};
+      render_components_.emplace(
+          tile_tag, RenderComponent{tile_tag, tile["texture_name"]});
+      position_components_.emplace(
+          tile_tag, PositionComponent{tile_tag, tile["x"], tile["y"]});
+      collision_components_.emplace(
+          tile_tag, CollisionComponent{tile_tag, kTileSize, kTileSize, 0, 0});
+    }
+  }
 }
 
 void LevelScene::initPlayer() {
@@ -92,7 +90,7 @@ void LevelScene::draw() const {
 
 #ifndef NDEBUG
   // Draw some debug info
-  DrawText("DEBUG mode press E to toggle editor", 10, 10, 15, BLACK);
+  DrawText("DEBUG mode press e to toggle editor", 10, 10, 15, BLACK);
 #endif
 
   // Draw static components (Tiles)

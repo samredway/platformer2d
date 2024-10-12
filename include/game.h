@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scenes/scene.h"
+#include <memory>
 
 namespace platformer2d {
 
@@ -9,13 +10,13 @@ class Game {
   Game();
   ~Game();
 
-  // Deltete copy consturctors
+  // Delete copy constructors
   Game(const Game& other) = delete;
   Game& operator=(const Game& other) = delete;
 
   // Delete move constructors
   Game(Game&& other) = delete;
-  Game operator=(Game&& other) = delete;
+  Game& operator=(Game&& other) = delete;
 
   // Public methods
   void update();
@@ -24,10 +25,10 @@ class Game {
  private:
   InputManager input_manager_;
   AssetManager asset_manager_;
-  std::unordered_map<std::string, std::unique_ptr<Scene>> scenes_;
-  Scene* current_scene_ = nullptr;
+  std::unique_ptr<Scene> current_scene_;
 
-  void setCurrentScene(const std::string& scene_name);
+  void handleInput();
+  void setCurrentScene(std::unique_ptr<Scene> new_scene);
 };
 
 }  // namespace platformer2d

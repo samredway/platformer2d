@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 
+#include "json.hpp"
 #include "level_editor/tile.h"
 #include "managers/asset_manager.h"
 
@@ -30,6 +31,8 @@ class TileMap {
       size_t tile_x, size_t tile_y) const;
   const TilesVec& getTiles() const;
   void draw() const;
+  nlohmann::json toJson() const;
+  void fromJson(const nlohmann::json& json);
 
   size_t getMaxTilesX() { return max_tiles_x_; }
 

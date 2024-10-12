@@ -14,6 +14,7 @@ class InputManager : public Manager {
 
 #ifndef NDEBUG
   bool isEPressed() const;
+  bool isSPressed() const;
   bool mouseClicked() const;
   int getMousePositionX() const;
   int getMousePositionY() const;
@@ -26,6 +27,7 @@ class InputManager : public Manager {
 
 #ifndef NDEBUG
   bool is_e_pressed_;
+  bool is_s_pressed_;
   bool is_mouse_clicked_;
   int mouse_position_x_;
   int mouse_position_y_;

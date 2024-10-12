@@ -1,17 +1,20 @@
+#include "scenes/level_editor.h"
+
+#include <fstream>
+
 #include "constants.h"
-#include "level_editor/tile_map.h"
+#include "json.hpp"
 #include "macros.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "raylib.h"
-#include "scenes/level_editor.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
 
 constexpr size_t kNumTilesX = (size_t)(kScreenWidth / kTileSize);
 constexpr size_t kNumTilesY = (size_t)(kScreenHeight / kTileSize);
-//
+
 // Forward declare free helpers
 void drawGrid();
 
@@ -22,59 +25,15 @@ LevelEditor::LevelEditor(AssetManager& asset_manager,
       tile_picker_{asset_manager} {}
 
 void LevelEditor::init() {
-  // Load in all the Tile textures
-  asset_manager_.loadTexture("tile_winter_ground_0",
-                             "assets/winter_ground/ground0.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_1",
-                             "assets/winter_ground/ground1.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_2",
-                             "assets/winter_ground/ground2.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_3",
-                             "assets/winter_ground/ground3.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_4",
-                             "assets/winter_ground/ground4.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_5",
-                             "assets/winter_ground/ground5.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_6",
-                             "assets/winter_ground/ground6.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_7",
-                             "assets/winter_ground/ground7.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_8",
-                             "assets/winter_ground/ground8.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ground_9",
-                             "assets/winter_ground/ground9.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_groundIce1",
-                             "assets/winter_ground/groundIce1.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_groundIce2",
-                             "assets/winter_ground/groundIce2.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_groundIce3",
-                             "assets/winter_ground/groundIce3.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_groundl",
-                             "assets/winter_ground/groundl.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_groundr",
-                             "assets/winter_ground/groundr.png", kTileSize,
-                             kTileSize);
-  asset_manager_.loadTexture("tile_winter_ice", "assets/winter_ground/ice.png",
-                             kTileSize, kTileSize);
-
-  // TODO load in character sprites and select single animation frame
-  // to place them
-
   tile_picker_.init();
+  nlohmann::json level_json;
+  std::ifstream file{"assets/levels/level_editor.json"};
+  if (!file.is_open()) {
+    DLOG("No level file found, starting with empty tile map");
+    return;
+  }
+  file >> level_json;
+  tile_map_.fromJson(level_json["tile_map"]);
 }
 
 void LevelEditor::update() {
@@ -83,7 +42,7 @@ void LevelEditor::update() {
 }
 
 void LevelEditor::handleInput() {
-  // Handle input for the level editor
+  // Handle mouse input for the level editor
   if (input_manager_.mouseClicked()) {
     const size_t tile_count_x =
         (input_manager_.getMousePositionX() / kTileSize);
@@ -105,11 +64,16 @@ void LevelEditor::handleInput() {
                                          input_manager_.getMousePositionY());
     }
   }
+
+  // Handle keyboard input for the level editor
+  if (input_manager_.isSPressed()) {
+    save();
+  }
 }
 
 void LevelEditor::draw() const {
   ClearBackground(background_color_);
-  DrawText("Level Editor", 10, 10, 15, BLACK);
+  DrawText("Level Editor e to toggle mode and s to save", 10, 10, 15, BLACK);
 
   // Draw the tile map as a grid
   drawGrid();
@@ -119,6 +83,19 @@ void LevelEditor::draw() const {
 
   // Draw the tile picker
   tile_picker_.draw();
+}
+
+void LevelEditor::save() const {
+  // convert tile map to json using nlohmann
+  nlohmann::json json;
+  json["tile_map"] = tile_map_.toJson();
+  std::ofstream file("assets/levels/level_editor.json");
+  if (!file.is_open()) {
+    PANIC("Failed to open file for saving");
+  }
+  file << json;
+  file.close();
+  DLOG("Saved level to assets/levels/level_editor.json");
 }
 
 // Free helper Methods

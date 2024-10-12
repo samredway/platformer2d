@@ -11,6 +11,7 @@ InputManager::InputManager()
 #ifndef NDEBUG
       ,
       is_e_pressed_(false),
+      is_s_pressed_(false),
       is_mouse_clicked_(false)
 #endif
 {
@@ -24,6 +25,7 @@ void InputManager::getInput() {
 // Level Editor stuff DEBUG build only
 #ifndef NDEBUG
   is_e_pressed_ = IsKeyPressed(KEY_E) ? true : false;
+  is_s_pressed_ = IsKeyPressed(KEY_S) ? true : false;
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     is_mouse_clicked_ = true;
@@ -44,6 +46,8 @@ bool InputManager::isSpace() const { return is_space_; }
 // Level Editor stuff DEBUG build only
 #ifndef NDEBUG
 bool InputManager::isEPressed() const { return is_e_pressed_; }
+
+bool InputManager::isSPressed() const { return is_s_pressed_; }
 
 bool InputManager::mouseClicked() const { return is_mouse_clicked_; }
 
