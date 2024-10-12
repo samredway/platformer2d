@@ -1,7 +1,8 @@
+#include "level_editor/tile_map.h"
+
 #include <functional>
 #include <vector>
 
-#include "level_editor/tile_map.h"
 #include "managers/asset_manager.h"
 #include "raylib.h"
 
@@ -15,6 +16,27 @@ TileMap::TileMap(size_t max_tiles_x, size_t max_tiles_y,
       asset_manager_(asset_manager) {}
 
 const TilesVec& TileMap::getTiles() const { return tiles_; }
+
+nlohmann::json TileMap::toJson() const {
+  nlohmann::json json;
+  for (const auto& row : getTiles()) {
+    std::vector<nlohmann::json> tile_row;
+    for (const auto& tile : row) {
+      tile_row.push_back(tile.toJson());
+    }
+    json["tiles"].push_back(tile_row);
+  }
+  return json;
+}
+
+void TileMap::fromJson(const nlohmann::json& json) {
+  for (size_t y = 0; y < json["tiles"].size(); ++y) {
+    for (size_t x = 0; x < json["tiles"][y].size(); ++x) {
+      const auto& tile = json["tiles"][y][x];
+      addTile(x, y, tile["x"], tile["y"], tile["texture_name"]);
+    }
+  }
+}
 
 bool TileMap::addTile(size_t tile_x, size_t tile_y, float pos_x, float pos_y,
                       std::string texture_name) {

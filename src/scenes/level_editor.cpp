@@ -1,9 +1,13 @@
+#include "scenes/level_editor.h"
+
+#include <fstream>
+
 #include "constants.h"
+#include "json.hpp"
 #include "macros.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "raylib.h"
-#include "scenes/level_editor.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -20,7 +24,6 @@ void drawGrid();
 constexpr int num_textures{16};
 typedef const std::array<std::tuple<std::string, std::string>, num_textures>
     TextureNameFile;
-
 TextureNameFile texture_name_to_file{
     std::tuple{"tile_winter_ground_0", "assets/winter_ground/ground0.png"},
     std::tuple{"tile_winter_ground_1", "assets/winter_ground/ground1.png"},
@@ -99,6 +102,18 @@ void LevelEditor::draw() const {
 
   // Draw the tile picker
   tile_picker_.draw();
+}
+
+void LevelEditor::save() const {
+  // convert tile map to json using nlohmann
+  nlohmann::json json;
+  json["tile_map"] = tile_map_.toJson();
+  std::ofstream file("assets/levels/level_editor.json");
+  if (!file.is_open()) {
+    PANIC("Failed to open file for saving");
+  }
+  file << json;
+  file.close();
 }
 
 // Free helper Methods
