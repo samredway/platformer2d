@@ -17,7 +17,9 @@ TilePicker::TilePicker(AssetManager& asset_manager)
 void TilePicker::init() {
   // Loop through assets and write each tile to the tilemap
   // For now we will ignore sprites
-  size_t count_x = 0;
+  // Note the first one is black so we can use it as a delete
+  // tile thus we start with x=1 not 0
+  size_t count_x = 1;
   size_t count_y = 0;
   for (auto& asset_it : asset_manager_.getTextures()) {
     auto& texture_name = asset_it.first;

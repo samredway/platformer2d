@@ -28,7 +28,6 @@ class TileMap {
                std::string texture_name);
   std::optional<std::reference_wrapper<const Tile>> getTile(
       size_t tile_x, size_t tile_y) const;
-  bool removeTile(size_t tile_x, size_t tile_y);
   const TilesVec& getTiles() const;
   void draw() const;
 
