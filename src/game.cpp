@@ -41,6 +41,17 @@ Game::Game() : input_manager_(), asset_manager_(), scenes_() {
 Game::~Game() { CloseWindow(); }
 
 void Game::update() {
+  handleInput();
+  current_scene_->update();
+}
+
+void Game::draw() const {
+  BeginDrawing();
+  current_scene_->draw();
+  EndDrawing();
+}
+
+void Game::handleInput() {
   input_manager_.getInput();
 #ifndef NDEBUG
   // Toggle editor mode
@@ -55,13 +66,6 @@ void Game::update() {
     }
   }
 #endif
-  current_scene_->update();
-}
-
-void Game::draw() const {
-  BeginDrawing();
-  current_scene_->draw();
-  EndDrawing();
 }
 
 void Game::setCurrentScene(const std::string& scene_name) {

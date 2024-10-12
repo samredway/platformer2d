@@ -66,7 +66,7 @@ void LevelEditor::update() {
 }
 
 void LevelEditor::handleInput() {
-  // Handle input for the level editor
+  // Handle mouse input for the level editor
   if (input_manager_.mouseClicked()) {
     const size_t tile_count_x =
         (input_manager_.getMousePositionX() / kTileSize);
@@ -88,11 +88,16 @@ void LevelEditor::handleInput() {
                                          input_manager_.getMousePositionY());
     }
   }
+
+  // Handle keyboard input for the level editor
+  if (input_manager_.isSPressed()) {
+    save();
+  }
 }
 
 void LevelEditor::draw() const {
   ClearBackground(background_color_);
-  DrawText("Level Editor", 10, 10, 15, BLACK);
+  DrawText("Level Editor e to toggle mode and s to save", 10, 10, 15, BLACK);
 
   // Draw the tile map as a grid
   drawGrid();
@@ -114,6 +119,7 @@ void LevelEditor::save() const {
   }
   file << json;
   file.close();
+  DLOG("Saved level to assets/levels/level_editor.json");
 }
 
 // Free helper Methods

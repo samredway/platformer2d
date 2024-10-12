@@ -27,6 +27,7 @@ class Game {
   std::unordered_map<std::string, std::unique_ptr<Scene>> scenes_;
   Scene* current_scene_ = nullptr;
 
+  void handleInput();
   void setCurrentScene(const std::string& scene_name);
 };
 
