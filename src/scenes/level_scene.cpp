@@ -30,13 +30,15 @@ void LevelScene::init() {
 }
 
 void LevelScene::loadLevelFromFile() {
-  std::ifstream file{"assets/levels/level_editor.json"};
+  std::string level_file_path{"assets/levels/level_editor.json"};
+  std::ifstream file{level_file_path};
   if (!file.is_open()) {
-    PANIC("Failed to open level file");
+    DLOG("Failed to open level file! Loading empty level");
+    return;
   }
+  DLOG("Loading level from file: " << level_file_path);
   nlohmann::json level_json;
   file >> level_json;
-
   // Create components from the json objects
   int counter{0};
   for (const auto& tile_row : level_json["tile_map"]["tiles"]) {

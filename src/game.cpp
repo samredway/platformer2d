@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include "constants.h"
-#include "macros.h"
 #include "raylib.h"
 #include "scenes/level_scene.h"
 
@@ -43,7 +42,7 @@ TextureNameFile texture_name_to_file{
     std::tuple{"tile_winter_ice", "assets/winter_ground/ice.png"},
 };
 
-Game::Game() : input_manager_(), asset_manager_(), scenes_() {
+Game::Game() : input_manager_(), asset_manager_() {
   // Setup Window
   initWindow();
 
@@ -59,16 +58,8 @@ Game::Game() : input_manager_(), asset_manager_(), scenes_() {
   asset_manager_.loadTexture("pink_monster_run",
                              "assets/Pink_Monster_Run_6.png");
 
-  scenes_["level"] =
-      std::make_unique<LevelScene>(asset_manager_, input_manager_);
-  scenes_["level"]->init();
-  current_scene_ = scenes_["level"].get();
-
-#ifndef NDEBUG
-  scenes_["editor"] =
-      std::make_unique<LevelEditor>(asset_manager_, input_manager_);
-  scenes_["editor"]->init();
-#endif
+  current_scene_ = std::make_unique<LevelScene>(asset_manager_, input_manager_);
+  current_scene_->init();
 }
 
 Game::~Game() { CloseWindow(); }
@@ -90,24 +81,22 @@ void Game::handleInput() {
   // Toggle editor mode
   if (input_manager_.isEPressed()) {
     if (current_scene_->name() == "level") {
-      setCurrentScene("editor");
+      setCurrentScene(
+          std::make_unique<LevelEditor>(asset_manager_, input_manager_));
       // Add width of tile picker to screen width
       resizeWindow(kScreenWidth + kTilePickerWidth, kScreenHeight);
     } else {
-      setCurrentScene("level");
+      setCurrentScene(
+          std::make_unique<LevelScene>(asset_manager_, input_manager_));
       resizeWindow(kScreenWidth, kScreenHeight);
     }
+    current_scene_->init();
   }
 #endif
 }
 
-void Game::setCurrentScene(const std::string& scene_name) {
-  auto it = scenes_.find(scene_name);
-  if (it != scenes_.end()) {
-    current_scene_ = it->second.get();
-  } else {
-    PANIC("Scene not found");
-  }
+void Game::setCurrentScene(std::unique_ptr<Scene> new_scene) {
+  current_scene_ = std::move(new_scene);
 }
 
 void initWindow() {

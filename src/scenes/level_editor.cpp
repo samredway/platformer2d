@@ -24,7 +24,17 @@ LevelEditor::LevelEditor(AssetManager& asset_manager,
       tile_map_{kNumTilesX, kNumTilesY, asset_manager},
       tile_picker_{asset_manager} {}
 
-void LevelEditor::init() { tile_picker_.init(); }
+void LevelEditor::init() {
+  tile_picker_.init();
+  nlohmann::json level_json;
+  std::ifstream file{"assets/levels/level_editor.json"};
+  if (!file.is_open()) {
+    DLOG("No level file found, starting with empty tile map");
+    return;
+  }
+  file >> level_json;
+  tile_map_.fromJson(level_json["tile_map"]);
+}
 
 void LevelEditor::update() {
   // Update the level editor

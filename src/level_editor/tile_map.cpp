@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 
+#include "macros.h"
 #include "managers/asset_manager.h"
 #include "raylib.h"
 
@@ -30,6 +31,7 @@ nlohmann::json TileMap::toJson() const {
 }
 
 void TileMap::fromJson(const nlohmann::json& json) {
+  DLOG("Loading tile map from json:\n" << json.dump(2));
   for (size_t y = 0; y < json["tiles"].size(); ++y) {
     for (size_t x = 0; x < json["tiles"][y].size(); ++x) {
       const auto& tile = json["tiles"][y][x];
