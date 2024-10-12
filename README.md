@@ -32,6 +32,10 @@ For macOS, I’ve pre-built the necessary assets and included them in the `lib/`
 
 I use a `Makefile` to build the project, so you should have `make` installed.
 
+### nlohmann/json
+
+This project uses [nlohmann/json](https://github.com/nlohmann/json) for JSON parsing. The library is included as a single header file (`json.hpp`) in the `lib/` folder, so you don't need to install it separately. It should work on all platforms without any additional setup.
+
 ### Optional: Bear for IDE Support
 
 If you're using an IDE or editor that benefits from `compile_commands.json` (e.g., for code navigation or autocompletion), you can use [Bear](https://github.com/rizsotto/Bear) to generate it. Bear is **optional** and not required to build or run the project.
@@ -80,5 +84,5 @@ The main folders are as follows:
 
 - include/ contains the .h files for the project
 - src/ contains the cpp files
-- lib/ is for 3rd party libs and currently contains the raylib files
+- lib/ is for 3rd party libs and currently contains the raylib files and nlohmann/json header
 - assets/ contains art assets
