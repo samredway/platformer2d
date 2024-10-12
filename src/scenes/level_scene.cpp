@@ -37,8 +37,6 @@ void LevelScene::loadLevelFromFile() {
   nlohmann::json level_json;
   file >> level_json;
 
-  DLOG("Loaded level from file:\n" << level_json.dump(2));
-
   // Create components from the json objects
   int counter{0};
   for (const auto& tile_row : level_json["tile_map"]["tiles"]) {
