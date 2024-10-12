@@ -29,6 +29,7 @@ class LevelScene : public Scene {
   void handleInput() override;
   void processRendering() const;
   void initPlayer();
+  void loadLevelFromFile();
 
   // Owned systems
   PhysicsSystem physics_;

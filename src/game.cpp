@@ -17,15 +17,48 @@ namespace platformer2d {
 void initWindow();
 void resizeWindow(const int width, const int height);
 
+// just declare a static array of tuple which has all Tiles in (name, file_name)
+// pairs maybe later will dynamicall load textures based on paths like
+// assets/tiles and assets/sprites. Doing it this way for now until I have a
+// better idea what is best
+constexpr int num_textures{18};
+typedef const std::array<std::tuple<std::string, std::string>, num_textures>
+    TextureNameFile;
+TextureNameFile texture_name_to_file{
+    std::tuple{"tile_winter_ground_0", "assets/winter_ground/ground0.png"},
+    std::tuple{"tile_winter_ground_1", "assets/winter_ground/ground1.png"},
+    std::tuple{"tile_winter_ground_2", "assets/winter_ground/ground2.png"},
+    std::tuple{"tile_winter_ground_3", "assets/winter_ground/ground3.png"},
+    std::tuple{"tile_winter_ground_4", "assets/winter_ground/ground4.png"},
+    std::tuple{"tile_winter_ground_5", "assets/winter_ground/ground5.png"},
+    std::tuple{"tile_winter_ground_6", "assets/winter_ground/ground6.png"},
+    std::tuple{"tile_winter_ground_7", "assets/winter_ground/ground7.png"},
+    std::tuple{"tile_winter_ground_8", "assets/winter_ground/ground8.png"},
+    std::tuple{"tile_winter_ground_9", "assets/winter_ground/ground9.png"},
+    std::tuple{"tile_winter_groundIce1", "assets/winter_ground/groundIce1.png"},
+    std::tuple{"tile_winter_groundIce2", "assets/winter_ground/groundIce2.png"},
+    std::tuple{"tile_winter_groundIce3", "assets/winter_ground/groundIce3.png"},
+    std::tuple{"tile_winter_groundl", "assets/winter_ground/groundl.png"},
+    std::tuple{"tile_winter_groundr", "assets/winter_ground/groundr.png"},
+    std::tuple{"tile_winter_ice", "assets/winter_ground/ice.png"},
+};
+
 Game::Game() : input_manager_(), asset_manager_(), scenes_() {
   // Setup Window
   initWindow();
 
-  // Currently we load the asset manager with all textures in a lazy fashion
-  // as they are needed. However all textures are held in RAM all the time
-  // if this becomes a problem we may need to let each scene load and destruct
-  // its own textures so as only to hold the textures in RAM that are required
-  // in the given scene
+  // Load all textures
+  for (auto& pair : texture_name_to_file) {
+    asset_manager_.loadTexture(std::get<0>(pair), std::get<1>(pair), kTileSize,
+                               kTileSize);
+  }
+
+  // Load in sprites
+  asset_manager_.loadTexture("pink_monster_idle",
+                             "assets/Pink_Monster_Idle_4.png");
+  asset_manager_.loadTexture("pink_monster_run",
+                             "assets/Pink_Monster_Run_6.png");
+
   scenes_["level"] =
       std::make_unique<LevelScene>(asset_manager_, input_manager_);
   scenes_["level"]->init();

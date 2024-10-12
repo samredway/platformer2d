@@ -18,47 +18,13 @@ constexpr size_t kNumTilesY = (size_t)(kScreenHeight / kTileSize);
 // Forward declare free helpers
 void drawGrid();
 
-// just declare a static array of tuple which has all texture (name, file_name)
-// pairs maybe later will dynamicall load textures based on paths like
-// assets/tiles and assets/sprites
-constexpr int num_textures{16};
-typedef const std::array<std::tuple<std::string, std::string>, num_textures>
-    TextureNameFile;
-TextureNameFile texture_name_to_file{
-    std::tuple{"tile_winter_ground_0", "assets/winter_ground/ground0.png"},
-    std::tuple{"tile_winter_ground_1", "assets/winter_ground/ground1.png"},
-    std::tuple{"tile_winter_ground_2", "assets/winter_ground/ground2.png"},
-    std::tuple{"tile_winter_ground_3", "assets/winter_ground/ground3.png"},
-    std::tuple{"tile_winter_ground_4", "assets/winter_ground/ground4.png"},
-    std::tuple{"tile_winter_ground_5", "assets/winter_ground/ground5.png"},
-    std::tuple{"tile_winter_ground_6", "assets/winter_ground/ground6.png"},
-    std::tuple{"tile_winter_ground_7", "assets/winter_ground/ground7.png"},
-    std::tuple{"tile_winter_ground_8", "assets/winter_ground/ground8.png"},
-    std::tuple{"tile_winter_ground_9", "assets/winter_ground/ground9.png"},
-    std::tuple{"tile_winter_groundIce1", "assets/winter_ground/groundIce1.png"},
-    std::tuple{"tile_winter_groundIce2", "assets/winter_ground/groundIce2.png"},
-    std::tuple{"tile_winter_groundIce3", "assets/winter_ground/groundIce3.png"},
-    std::tuple{"tile_winter_groundl", "assets/winter_ground/groundl.png"},
-    std::tuple{"tile_winter_groundr", "assets/winter_ground/groundr.png"},
-    std::tuple{"tile_winter_ice", "assets/winter_ground/ice.png"}};
-
 LevelEditor::LevelEditor(AssetManager& asset_manager,
                          InputManager& input_manager)
     : Scene("editor", SKYBLUE, asset_manager, input_manager),
       tile_map_{kNumTilesX, kNumTilesY, asset_manager},
       tile_picker_{asset_manager} {}
 
-void LevelEditor::init() {
-  // Load in all the Tile textures
-  for (auto& pair : texture_name_to_file) {
-    asset_manager_.loadTexture(std::get<0>(pair), std::get<1>(pair), kTileSize,
-                               kTileSize);
-  }
-  // TODO load in character sprites and select single animation frame
-  // to place them
-
-  tile_picker_.init();
-}
+void LevelEditor::init() { tile_picker_.init(); }
 
 void LevelEditor::update() {
   // Update the level editor
