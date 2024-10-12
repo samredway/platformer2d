@@ -1,5 +1,3 @@
-#include "scenes/level_scene.h"
-
 #include <fstream>
 #include <string>
 
@@ -8,6 +6,7 @@
 #include "constants.h"
 #include "json.hpp"
 #include "raylib.h"
+#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -104,16 +103,20 @@ void LevelScene::handleInput() {
   MovementComponent& player_movement =
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 
-  const float rate_acceleration{player_movement.walk_force /
-                                player_movement.mass};
+  // If player is in air we still allow them some left right
+  // movement cause ... game. But lets reduct it
+  const float movement_speed_divisor = player_movement.is_grounded ? 1.0 : 15.0;
+  const float rate_acceleration{
+      (player_movement.walk_force / player_movement.mass) /
+      movement_speed_divisor};
 
   // Accelerate in direction pressed.
   // If nothing pressed then decellerate unless at rest then stop
-  if (input_manager_.isRight() && player_movement.is_grounded) {
+  if (input_manager_.isRight()) {
     // Accelerate right
     player_movement.acceleration_x = rate_acceleration;
     player_movement.is_facing_right = true;
-  } else if (input_manager_.isLeft() && player_movement.is_grounded) {
+  } else if (input_manager_.isLeft()) {
     // Accelerate left
     player_movement.acceleration_x = -rate_acceleration;
     player_movement.is_facing_right = false;
