@@ -5,3 +5,6 @@ build/
 
 # produced by `bear -- make` used by ide for code completion
 compile_commands.json
+
+# vscode
+.vscode/
