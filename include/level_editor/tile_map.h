@@ -11,7 +11,7 @@
 
 namespace platformer2d {
 
-typedef std::vector<std::vector<Tile>> TilesVec;
+using TilesVec = std::vector<std::vector<Tile>>;
 
 /**
  *  Internal model of the tile map is an vector of vectors

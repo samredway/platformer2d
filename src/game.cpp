@@ -21,8 +21,8 @@ void resizeWindow(const int width, const int height);
 // assets/tiles and assets/sprites. Doing it this way for now until I have a
 // better idea what is best
 constexpr int num_textures{18};
-typedef const std::array<std::tuple<std::string, std::string>, num_textures>
-    TextureNameFile;
+using TextureNameFile =
+    const std::array<std::tuple<std::string, std::string>, num_textures>;
 TextureNameFile texture_name_to_file{
     std::tuple{"tile_winter_ground_0", "assets/winter_ground/ground0.png"},
     std::tuple{"tile_winter_ground_1", "assets/winter_ground/ground1.png"},

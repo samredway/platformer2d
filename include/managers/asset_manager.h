@@ -8,7 +8,7 @@
 
 namespace platformer2d {
 
-typedef std::unordered_map<std::string, Texture2D> TextureMap;
+using TextureMap = std::unordered_map<std::string, Texture2D>;
 
 class AssetManager : public Manager {
  public:
