@@ -18,15 +18,20 @@ endif()
 
 # Add Compiler Flags based on Build Type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-g -O0 )
+    add_compile_options(-g -O0)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-O2 -DNDEBUG)
+    add_compile_options(-O2 -DNDEBUG) 
 endif()
 
 # Include FetchContent Module
 include(FetchContent)
 
 # Fetch and Add Raylib
+
+# Suppress openGL deprecation warnings
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON) 
+
+# Dont build examples and games
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
@@ -36,6 +41,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
+# Re-enable developer warnings
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF)
+
 # Fetch and Add nlohmann_json
 FetchContent_Declare(
   json
@@ -44,8 +52,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(json)
-
-set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 # Include Directories
 include_directories(include)
