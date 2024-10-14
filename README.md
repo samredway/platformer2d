@@ -24,45 +24,43 @@ This is a toy project to learn about game programming patterns and design princi
 
 ## Dependencies
 
-### Raylib
+### CMake and Ninja
 
-The project depends on [Raylib](https://www.raylib.com/), which you can install via Homebrew or build from source (see the [Raylib documentation](https://www.raylib.com/)).
-
-For macOS, I’ve pre-built the necessary assets and included them in the `lib/` folder. If you’re using a different OS, you’ll need to build or install Raylib and swap out the library files as appropriate.
-
-I use a `Makefile` to build the project, so you should have `make` installed.
-
-### nlohmann/json
-
-This project uses [nlohmann/json](https://github.com/nlohmann/json) for JSON parsing. The library is included as a single header file (`json.hpp`) in the `lib/` folder, so you don't need to install it separately. It should work on all platforms without any additional setup.
-
-### Optional: Bear for IDE Support
-
-If you're using an IDE or editor that benefits from `compile_commands.json` (e.g., for code navigation or autocompletion), you can use [Bear](https://github.com/rizsotto/Bear) to generate it. Bear is **optional** and not required to build or run the project.
-
-To install Bear on macOS:
+This project uses CMake as its build system and Ninja as the build tool. You'll need to have both installed on your system. On macOS, you can install them via Homebrew:
 
 ```bash
-brew install bear
+brew install cmake ninja
 ```
+
+For other platforms, please refer to the official installation guides for [CMake](https://cmake.org/install/) and [Ninja](https://ninja-build.org/).
+
+### Raylib and nlohmann/json
+
+The project depends on [Raylib](https://www.raylib.com/) and [nlohmann/json](https://github.com/nlohmann/json). These dependencies are automatically managed by CMake and will be downloaded and built during the project configuration.
 
 ## Build
 
-You can build the project just running
+This project uses a cross-platform CMake build system with Ninja, but it has only been tested on macOS. To build the project:
+
+1. Configure the project:
+   ```bash
+   cmake --preset default
+   ```
+
+2. Build the project:
+   ```bash
+   cmake --build --preset default
+   ```
+
+The executable will be created in the `build/bin` directory.
+
+## Run
+
+After building, you can run the game from the build directory:
 
 ```bash
-make
+./build/bin/Platformer2d
 ```
-
-If you want to use `bear` to generate a compile_commamnds.json
-
-```bash
-bear -- make
-```
-
-Now you can run the game with:
-
-    bin/game
 
 ## Style
 
@@ -84,5 +82,4 @@ The main folders are as follows:
 
 - include/ contains the .h files for the project
 - src/ contains the cpp files
-- lib/ is for 3rd party libs and currently contains the raylib files and nlohmann/json header
 - assets/ contains art assets
