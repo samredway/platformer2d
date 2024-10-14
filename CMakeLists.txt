@@ -45,6 +45,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(json)
 
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 # Include Directories
 include_directories(include)
