@@ -1,12 +1,13 @@
+#include "scenes/level_scene.h"
+
 #include <fstream>
 #include <string>
 
 #include "components/animation_component.h"
 #include "components/movement_component.h"
 #include "constants.h"
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 #include "raylib.h"
-#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {

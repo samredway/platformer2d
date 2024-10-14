@@ -3,10 +3,10 @@
 #include <fstream>
 
 #include "constants.h"
-#include "json.hpp"
 #include "macros.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
+#include "nlohmann/json.hpp"
 #include "raylib.h"
 #include "scenes/scene.h"
 
