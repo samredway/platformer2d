@@ -206,14 +206,17 @@ void handleTwoWayCollisionX(MovementComponent& movement_component_1,
 
   // Apply an equal and opposite reaction (however we also articially set
   // velocity to 0 to prevent glitches with overshoot)
-  // Common sense guard before applying to stop collision still occuring when
+  // Common sense guards before applying to stop collision still occuring when
   // the player changes direction after initial collision
-  if ((closest == RectangleSide::kLeft &&
-       movement_component_1.velocity_x > 0) ||
-      (closest == RectangleSide::kRight &&
-       movement_component_1.velocity_x < 0)) {
+  if (closest == RectangleSide::kLeft && movement_component_1.velocity_x > 0) {
     movement_component_1.velocity_x = 0;
-    movement_component_1.acceleration_x = -movement_component_1.acceleration_x;
+    movement_component_1.acceleration_x =
+        -std::abs(movement_component_1.acceleration_x);
+  }
+  if (closest == RectangleSide::kRight && movement_component_1.velocity_x < 0) {
+    movement_component_1.velocity_x = 0;
+    movement_component_1.acceleration_x =
+        std::abs(movement_component_1.acceleration_x);
   }
   if ((closest == RectangleSide::kTop &&
        movement_component_1.velocity_y >= 0)) {
