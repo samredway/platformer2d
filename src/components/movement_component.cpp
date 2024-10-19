@@ -1,6 +1,6 @@
-#include "components/movement_component.h"
-
 #include <string>
+
+#include "components/movement_component.h"
 
 namespace platformer2d {
 
@@ -22,5 +22,4 @@ MovementComponent::MovementComponent(const std::string& tag, float velocity_x,
       drag(drag),
       is_grounded(is_grounded),
       is_facing_right(is_facing_right) {}
-
 }  // namespace platformer2d

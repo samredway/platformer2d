@@ -1,5 +1,3 @@
-#include "scenes/level_scene.h"
-
 #include <fstream>
 #include <string>
 
@@ -8,6 +6,7 @@
 #include "constants.h"
 #include "nlohmann/json.hpp"
 #include "raylib.h"
+#include "scenes/level_scene.h"
 #include "scenes/scene.h"
 
 namespace platformer2d {
@@ -54,6 +53,15 @@ void LevelScene::loadLevelFromFile() {
           tile_tag, PositionComponent{tile_tag, tile["x"], tile["y"]});
       collision_components_.emplace(
           tile_tag, CollisionComponent{tile_tag, kTileSize, kTileSize, 0, 0});
+
+      // This feels a bit hacky later on will want to be able to add
+      // characteristics to the tile in the level editor or tile picker but now
+      // just add directly here
+      if (tile["texture_name"] == "tile_winter_ice") {
+        MovementComponent mover{tile_tag};
+        mover.mass = 50.0f;
+        movement_components_.emplace(tile_tag, mover);
+      }
     }
   }
 }
@@ -80,9 +88,9 @@ void LevelScene::initPlayer() {
 
 void LevelScene::update() {
   handleInput();
+  physics_.update();
   animation_state_system_.update();
   animation_system_.update();
-  physics_.update();
 }
 
 void LevelScene::draw() const {

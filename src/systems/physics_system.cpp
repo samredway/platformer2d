@@ -1,5 +1,3 @@
-#include "systems/physics_system.h"
-
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -12,19 +10,27 @@
 #include "components/position_component.h"
 #include "constants.h"
 #include "raylib.h"
+#include "systems/physics_system.h"
 
 namespace platformer2d {
 
 // Forward declarations of free helper functions
-enum class RectangleSide;
-RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
-                                      const Rectangle& collision_box_2);
-void handleCollision(MovementComponent& movement_component,
-                     PositionComponent& position,
-                     const Rectangle& collision_box_1,
-                     const Rectangle& collision_box_2);
-void updateVelocityY(MovementComponent& movement, float delta_time);
-void updateVelocityX(MovementComponent& movement, float delta_time);
+static RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
+                                             const Rectangle& collision_box_2);
+static void handleCollision(MovementComponent& movement_component,
+                            PositionComponent& position,
+                            const Rectangle& collision_box_1,
+                            const Rectangle& collision_box_2,
+                            RectangleSide closest);
+static void handleTwoWayCollisionX(MovementComponent& movement_component_1,
+                                   PositionComponent& position_1,
+                                   const Rectangle& collision_box_1,
+                                   MovementComponent& movement_component_2,
+                                   PositionComponent& position_2,
+                                   const Rectangle& collision_box_2,
+                                   RectangleSide closest);
+static void updateVelocityY(MovementComponent& movement, float delta_time);
+static void updateVelocityX(MovementComponent& movement, float delta_time);
 
 // Public methods
 PhysicsSystem::PhysicsSystem(
@@ -74,8 +80,24 @@ void PhysicsSystem::update() {
           collision_box_1.y <= collision_box_2.y + collision_box_2.height;
 
       if (is_colliding) {
-        handleCollision(movement_component, position, collision_box_1,
-                        collision_box_2);
+        // Check if the second object is movable
+        bool obj_is_movable =
+            movement_components_.contains(collider_pair.first) ? true : false;
+
+        RectangleSide closest =
+            getClosestRectangleSide(collision_box_1, collision_box_2);
+
+        // Currently only allowing objects to push each other on the x plane
+        if (obj_is_movable) {
+          handleTwoWayCollisionX(movement_component, position, collision_box_1,
+                                 movement_components_.at(collider_pair.first),
+                                 position_components_.at(collider_pair.first),
+                                 collision_2.getCollisionBox(position2),
+                                 closest);
+        } else {
+          handleCollision(movement_component, position, collision_box_1,
+                          collision_box_2, closest);
+        }
       }
     }
 
@@ -89,8 +111,6 @@ void PhysicsSystem::update() {
 }
 
 // Helper function implementations
-enum class RectangleSide { kTop, kBottom, kRight, kLeft };
-
 RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
                                       const Rectangle& collision_box_2) {
   const float bottom_diff =
@@ -122,10 +142,7 @@ constexpr float kCollisionOffset = 0.5f;
 void handleCollision(MovementComponent& movement_component,
                      PositionComponent& position,
                      const Rectangle& collision_box_1,
-                     const Rectangle& collision_box_2) {
-  RectangleSide closest =
-      getClosestRectangleSide(collision_box_1, collision_box_2);
-
+                     const Rectangle& collision_box_2, RectangleSide closest) {
   // position x offset for mover
   const float position_x_offset = std::abs(collision_box_1.x - position.x);
   // TODO Need to handle cases where there is a y offset for the mover
@@ -156,6 +173,57 @@ void handleCollision(MovementComponent& movement_component,
       movement_component.velocity_y = 0;
       movement_component.acceleration_y = 0;
       break;
+  }
+}
+
+// With two moving or movable objects we need to calculate the new direction
+// and accelleration doing a calc to make sure that the force is realistic
+// Only calc for the mover as the second mover will be calculated in its own
+// turn
+void handleTwoWayCollisionX(MovementComponent& movement_component_1,
+                            PositionComponent& position_1,
+                            const Rectangle& collision_box_1,
+                            MovementComponent& movement_component_2,
+                            PositionComponent& position_2,
+                            const Rectangle& collision_box_2,
+                            RectangleSide closest) {
+  (void)position_1;
+  (void)position_2;
+  (void)collision_box_1;
+  (void)collision_box_2;
+  (void)movement_component_2;
+
+  // If the collision is in the x direction then calculate new velocities
+  // based on a simple impulse resolution
+  // float mass1 = movement_component_1.mass;
+  // float mass2 = movement_component_2.mass;
+
+  // Calculate the new velocities if colliding in x direction
+  // float new_velocity_x1 =
+  //     std::abs((movement_component_1.velocity_x * (mass1 - mass2) +
+  //               (2 * mass2 * movement_component_2.velocity_x)) /
+  //              (mass1 + mass2));
+
+  // Apply an equal and opposite reaction (however we also articially set
+  // velocity to 0 to prevent glitches with overshoot)
+  // Common sense guard before applying to stop collision still occuring when
+  // the player changes direction after initial collision
+  if ((closest == RectangleSide::kLeft &&
+       movement_component_1.velocity_x > 0) ||
+      (closest == RectangleSide::kRight &&
+       movement_component_1.velocity_x < 0)) {
+    movement_component_1.velocity_x = 0;
+    movement_component_1.acceleration_x = -movement_component_1.acceleration_x;
+  }
+  if ((closest == RectangleSide::kTop &&
+       movement_component_1.velocity_y >= 0)) {
+    movement_component_1.velocity_y = 0;
+    movement_component_1.is_grounded = true;
+  }
+  if ((closest == RectangleSide::kBottom &&
+       movement_component_1.velocity_y < 0)) {
+    movement_component_1.velocity_y = 0;
+    movement_component_1.acceleration_y = -movement_component_1.acceleration_y;
   }
 }
 

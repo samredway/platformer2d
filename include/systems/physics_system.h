@@ -8,6 +8,8 @@
 
 namespace platformer2d {
 
+enum class RectangleSide { kTop, kBottom, kRight, kLeft };
+
 class PhysicsSystem {
  public:
   PhysicsSystem(
