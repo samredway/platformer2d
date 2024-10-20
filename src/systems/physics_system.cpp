@@ -89,9 +89,13 @@ void PhysicsSystem::update() {
 
         // Currently only allowing objects to push each other on the x plane
         if (obj_is_movable) {
+          MovementComponent& movement_component_2 =
+              getComponentOrPanic(movement_components_, collider_pair.first);
+          PositionComponent& position_component_2 =
+              getComponentOrPanic(position_components_, collider_pair.first);
+
           handleTwoWayCollisionX(movement_component, position, collision_box_1,
-                                 movement_components_.at(collider_pair.first),
-                                 position_components_.at(collider_pair.first),
+                                 movement_component_2, position_component_2,
                                  collision_2.getCollisionBox(position2),
                                  closest);
         } else {

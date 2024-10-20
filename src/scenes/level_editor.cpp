@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "constants.h"
-#include "macros.h"
+#include "debug.h"
 #include "managers/asset_manager.h"
 #include "managers/input_manager.h"
 #include "nlohmann/json.hpp"

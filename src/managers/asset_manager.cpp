@@ -1,6 +1,6 @@
 #include "managers/asset_manager.h"
 
-#include "macros.h"
+#include "debug.h"
 
 namespace platformer2d {
 

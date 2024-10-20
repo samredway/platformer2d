@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 
-#include "macros.h"
+#include "debug.h"
 #include "managers/asset_manager.h"
 #include "raylib.h"
 

@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "macros.h"
+#include "debug.h"
 
 namespace platformer2d {
 

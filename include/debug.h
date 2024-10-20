@@ -3,6 +3,8 @@
 #include <cstdlib>   // For std::abort
 #include <iostream>  // for std::cerr
 
+namespace platformer2d {
+
 #define CHECK(condition, errstring)                                    \
   do {                                                                 \
     if (!(condition)) {                                                \
@@ -33,3 +35,5 @@
 #else
 #define DLOG(message) ((void)0)
 #endif
+
+}  // namespace platformer2d
