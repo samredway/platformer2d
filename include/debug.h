@@ -22,7 +22,7 @@ namespace platformer2d {
 
 #define PANIC(err_message)                                           \
   do {                                                               \
-    std::cerr << "Panic: " << err_message << " in file " << __FILE__ \
+    std::cerr << "PANIC: " << err_message << " in file " << __FILE__ \
               << " at line " << __LINE__ << std::endl;               \
     std::abort();                                                    \
   } while (false)

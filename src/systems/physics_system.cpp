@@ -1,3 +1,5 @@
+#include "systems/physics_system.h"
+
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -10,29 +12,19 @@
 #include "components/position_component.h"
 #include "constants.h"
 #include "raylib.h"
-#include "systems/physics_system.h"
 
 namespace platformer2d {
 
-// Forward declarations of free helper functions
+// Forward declarations of free helper functions ////////////////////////////
 static RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
                                              const Rectangle& collision_box_2);
-static void handleCollision(MovementComponent& movement_component,
-                            PositionComponent& position,
-                            const Rectangle& collision_box_1,
-                            const Rectangle& collision_box_2,
-                            RectangleSide closest);
-static void handleTwoWayCollisionX(MovementComponent& movement_component_1,
-                                   PositionComponent& position_1,
-                                   const Rectangle& collision_box_1,
-                                   MovementComponent& movement_component_2,
-                                   PositionComponent& position_2,
-                                   const Rectangle& collision_box_2,
-                                   RectangleSide closest);
+// static void handlePhysicsCollision(MovementComponent& movement_component_1,
+//                                    MovementComponent& movement_component_2,
+//                                    RectangleSide closest);
 static void updateVelocityY(MovementComponent& movement, float delta_time);
 static void updateVelocityX(MovementComponent& movement, float delta_time);
 
-// Public methods
+// Public methods /////////////////////////////////////////////////////////////
 PhysicsSystem::PhysicsSystem(
     std::unordered_map<std::string, MovementComponent>& movement_components,
     std::unordered_map<std::string, PositionComponent>& position_components,
@@ -42,79 +34,125 @@ PhysicsSystem::PhysicsSystem(
       collision_components_(collision_components) {}
 
 void PhysicsSystem::update() {
-  const float dt = GetFrameTime();
-
   for (auto& movement_pair : movement_components_) {
-    const std::string& mover_entity_tag = movement_pair.first;
-
-    MovementComponent& movement_component = movement_pair.second;
-    auto& position = getComponentOrPanic<PositionComponent>(
-        position_components_, mover_entity_tag);
-
-    std::vector<std::string> have_checked{mover_entity_tag};
-
-    movement_component.is_grounded = false;
-
-    for (const auto& collider_pair : collision_components_) {
-      if (std::find(have_checked.begin(), have_checked.end(),
-                    collider_pair.first) != have_checked.end()) {
-        continue;
-      }
-
-      // Get the collision components for the mover and the collider
-      const auto& collision_1 = getComponentOrPanic<CollisionComponent>(
-          collision_components_, mover_entity_tag);
-      const auto& collision_2 = collider_pair.second;
-
-      const PositionComponent& position2 =
-          getComponentOrPanic<PositionComponent>(position_components_,
-                                                 collider_pair.first);
-
-      const Rectangle collision_box_1 = collision_1.getCollisionBox(position);
-      const Rectangle collision_box_2 = collision_2.getCollisionBox(position2);
-
-      const bool is_colliding =
-          collision_box_1.x <= collision_box_2.x + collision_box_2.width &&
-          collision_box_1.x + collision_box_1.width >= collision_box_2.x &&
-          collision_box_1.y + collision_box_1.height >= collision_box_2.y &&
-          collision_box_1.y <= collision_box_2.y + collision_box_2.height;
-
-      if (is_colliding) {
-        // Check if the second object is movable
-        bool obj_is_movable =
-            movement_components_.contains(collider_pair.first) ? true : false;
-
-        RectangleSide closest =
-            getClosestRectangleSide(collision_box_1, collision_box_2);
-
-        // Currently only allowing objects to push each other on the x plane
-        if (obj_is_movable) {
-          MovementComponent& movement_component_2 =
-              getComponentOrPanic(movement_components_, collider_pair.first);
-          PositionComponent& position_component_2 =
-              getComponentOrPanic(position_components_, collider_pair.first);
-
-          handleTwoWayCollisionX(movement_component, position, collision_box_1,
-                                 movement_component_2, position_component_2,
-                                 collision_2.getCollisionBox(position2),
-                                 closest);
-        } else {
-          handleCollision(movement_component, position, collision_box_1,
-                          collision_box_2, closest);
-        }
-      }
-    }
-
-    // Update position after handling collisions
-    updateVelocityY(movement_component, dt);
-    position.y += movement_component.velocity_y;
-
-    updateVelocityX(movement_component, dt);
-    position.x += movement_component.velocity_x;
+    PhysicsComponent mover = getPhysicsComponent(movement_pair.first);
+    std::vector<CollisionPair> collisions = calculateCollisions(mover);
+    resolveCollisions(collisions);
+    updateVelocity(mover);
+    updatePosition(mover);
   }
 }
 
-// Helper function implementations
+// Private methods ////////////////////////////////////////////////////////////
+std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
+    PhysicsComponent& mover) {
+  std::vector<CollisionPair> collisions;
+  const auto& collision_box_1 = mover.collision.getCollisionBox(mover.position);
+
+  // Check each mover against each collider
+  for (const auto& collider_pair : collision_components_) {
+    const auto& physics_component_2 = getPhysicsComponent(collider_pair.first);
+    const auto& collision_box_2 = physics_component_2.collision.getCollisionBox(
+        physics_component_2.position);
+
+    const bool is_colliding =
+        collision_box_1.x <= collision_box_2.x + collision_box_2.width &&
+        collision_box_1.x + collision_box_1.width >= collision_box_2.x &&
+        collision_box_1.y + collision_box_1.height >= collision_box_2.y &&
+        collision_box_1.y <= collision_box_2.y + collision_box_2.height;
+
+    if (is_colliding) {
+      collisions.push_back({mover, physics_component_2});
+    }
+  }
+  return collisions;
+}
+
+PhysicsSystem::PhysicsComponent PhysicsSystem::getPhysicsComponent(
+    const std::string& entity_id) {
+  const auto& collision =
+      getComponentOrPanic<CollisionComponent>(collision_components_, entity_id);
+  auto& position =
+      getComponentOrPanic<PositionComponent>(position_components_, entity_id);
+  auto& movement =
+      getComponentOrPanic<MovementComponent>(movement_components_, entity_id);
+  return {collision, position, movement};
+}
+
+void PhysicsSystem::resolveCollisions(
+    std::vector<PhysicsSystem::CollisionPair>& collisions) {
+  constexpr float kCollisionOffset = 0.5f;
+  for (const auto& collision_pair : collisions) {
+    // position x offset for mover
+    const float position_x_offset =
+        std::abs(collision_pair.mover.collision
+                     .getCollisionBox(collision_pair.mover.position)
+                     .x -
+                 collision_pair.mover.position.x);
+    // TODO Need to handle cases where there is a y offset for the mover
+    // TODO Need to handle casee where the collider object has its own offset
+    const RectangleSide closest = getClosestRectangleSide(
+        collision_pair.mover.collision.getCollisionBox(
+            collision_pair.mover.position),
+        collision_pair.collider.collision.getCollisionBox(
+            collision_pair.collider.position));
+
+    switch (closest) {
+        // Mover has collided with the RectangleSide::x of the collider
+      case RectangleSide::kTop:
+        collision_pair.mover.position.y =
+            collision_pair.collider.collision
+                .getCollisionBox(collision_pair.collider.position)
+                .y -
+            collision_pair.mover.collision
+                .getCollisionBox(collision_pair.mover.position)
+                .height;
+        collision_pair.mover.movement.velocity_y = 0;
+        collision_pair.mover.movement.is_grounded = true;
+        break;
+      case RectangleSide::kLeft:
+        collision_pair.mover.position.x =
+            collision_pair.collider.collision
+                .getCollisionBox(collision_pair.collider.position)
+                .x -
+            position_x_offset - kCollisionOffset;
+        collision_pair.mover.movement.velocity_x = 0;
+        collision_pair.mover.movement.acceleration_x = 0;
+        break;
+      case RectangleSide::kRight:
+        collision_pair.mover.position.x =
+            collision_pair.collider.collision
+                .getCollisionBox(collision_pair.collider.position)
+                .x +
+            position_x_offset + kCollisionOffset;
+        collision_pair.mover.movement.velocity_x = 0;
+        collision_pair.mover.movement.acceleration_x = 0;
+        break;
+      case RectangleSide::kBottom:
+        collision_pair.mover.position.y =
+            collision_pair.collider.collision
+                .getCollisionBox(collision_pair.collider.position)
+                .y +
+            kCollisionOffset;
+        collision_pair.mover.movement.velocity_y = 0;
+        collision_pair.mover.movement.acceleration_y = 0;
+        break;
+    }
+  }
+}
+
+void PhysicsSystem::updateVelocity(PhysicsComponent& mover) {
+  const float delta_time = GetFrameTime();
+  updateVelocityY(mover.movement, delta_time);
+  updateVelocityX(mover.movement, delta_time);
+}
+
+void PhysicsSystem::updatePosition(PhysicsComponent& mover) {
+  mover.position.x += mover.movement.velocity_x;
+  mover.position.y += mover.movement.velocity_y;
+}
+
+// Helper function implementations ////////////////////////////////////////////
 RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
                                       const Rectangle& collision_box_2) {
   const float bottom_diff =
@@ -139,100 +177,50 @@ RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
     return RectangleSide::kLeft;
 }
 
-// Constants for collision offset which is the distance the mover is
-// offset from the collision object so as to not get stuck in the object
-constexpr float kCollisionOffset = 0.5f;
-
-void handleCollision(MovementComponent& movement_component,
-                     PositionComponent& position,
-                     const Rectangle& collision_box_1,
-                     const Rectangle& collision_box_2, RectangleSide closest) {
-  // position x offset for mover
-  const float position_x_offset = std::abs(collision_box_1.x - position.x);
-  // TODO Need to handle cases where there is a y offset for the mover
-  // TODO Need to handle casee where the collider object has its own offset
-
-  switch (closest) {
-    // Mover has collided with the RectangleSide::x of the collider
-    case RectangleSide::kTop:
-      position.y = collision_box_2.y - collision_box_1.height;
-      movement_component.velocity_y = 0;
-      movement_component.is_grounded = true;
-      break;
-    case RectangleSide::kLeft:
-      position.x = collision_box_2.x - collision_box_1.width -
-                   position_x_offset - kCollisionOffset;
-      movement_component.velocity_x = 0;
-      movement_component.acceleration_x = 0;
-      break;
-    case RectangleSide::kRight:
-      position.x = collision_box_2.x + collision_box_2.width -
-                   position_x_offset + kCollisionOffset;
-      movement_component.velocity_x = 0;
-      movement_component.acceleration_x = 0;
-      break;
-    case RectangleSide::kBottom:
-      position.y =
-          collision_box_2.y + collision_box_2.height + kCollisionOffset;
-      movement_component.velocity_y = 0;
-      movement_component.acceleration_y = 0;
-      break;
-  }
-}
-
-// With two moving or movable objects we need to calculate the new direction
+// with two moving or movable objects we need to calculate the new direction
 // and accelleration doing a calc to make sure that the force is realistic
-// Only calc for the mover as the second mover will be calculated in its own
+// only calc for the mover as the second mover will be calculated in its own
 // turn
-void handleTwoWayCollisionX(MovementComponent& movement_component_1,
-                            PositionComponent& position_1,
-                            const Rectangle& collision_box_1,
-                            MovementComponent& movement_component_2,
-                            PositionComponent& position_2,
-                            const Rectangle& collision_box_2,
-                            RectangleSide closest) {
-  (void)position_1;
-  (void)position_2;
-  (void)collision_box_1;
-  (void)collision_box_2;
-  (void)movement_component_2;
-
-  // If the collision is in the x direction then calculate new velocities
-  // based on a simple impulse resolution
-  // float mass1 = movement_component_1.mass;
-  // float mass2 = movement_component_2.mass;
-
-  // Calculate the new velocities if colliding in x direction
-  // float new_velocity_x1 =
-  //     std::abs((movement_component_1.velocity_x * (mass1 - mass2) +
-  //               (2 * mass2 * movement_component_2.velocity_x)) /
-  //              (mass1 + mass2));
-
-  // Apply an equal and opposite reaction (however we also articially set
-  // velocity to 0 to prevent glitches with overshoot)
-  // Common sense guards before applying to stop collision still occuring when
-  // the player changes direction after initial collision
-  if (closest == RectangleSide::kLeft && movement_component_1.velocity_x > 0) {
-    movement_component_1.velocity_x = 0;
-    movement_component_1.acceleration_x =
-        -std::abs(movement_component_1.acceleration_x);
-  }
-  if (closest == RectangleSide::kRight && movement_component_1.velocity_x < 0) {
-    movement_component_1.velocity_x = 0;
-    movement_component_1.acceleration_x =
-        std::abs(movement_component_1.acceleration_x);
-  }
-  if ((closest == RectangleSide::kTop &&
-       movement_component_1.velocity_y >= 0)) {
-    movement_component_1.velocity_y = 0;
-    movement_component_1.is_grounded = true;
-  }
-  if ((closest == RectangleSide::kBottom &&
-       movement_component_1.velocity_y < 0)) {
-    movement_component_1.velocity_y = 0;
-    movement_component_1.acceleration_y = -movement_component_1.acceleration_y;
-  }
-}
+// void handlephysicscollision(movementcomponent& movement_component_1,
+//                             movementcomponent& movement_component_2,
+//                             rectangleside closest) {
+//   // apply an equal and opposite reaction (however we also articially set
+//   // velocity to 0 to prevent glitches with overshoot)
+//   // common sense guards before applying to stop collision still occuring
+//   when
+//   // the player changes direction after initial collision
+//   if (closest == rectangleside::kleft && movement_component_1.velocity_x > 0)
+//   {
+//     // todo these are wrong. we should not be setting the velocity to 0.
+//     // we should be applying an appropriately sized opposite force to the
+//     // mover which will result in a change in acceleration
+//     // todo we need to calculate the force based on the mass of the objects
+//     movement_component_1.velocity_x = 0;
+//     movement_component_1.acceleration_x =
+//         -std::abs(movement_component_1.acceleration_x);
+//     movement_component_2.acceleration_x =
+//     movement_component_1.acceleration_x;
+//   }
+//   if (closest == rectangleside::kright && movement_component_1.velocity_x <
+//   0) {
+//     movement_component_1.velocity_x = 0;
+//     movement_component_1.acceleration_x =
+//         std::abs(movement_component_1.acceleration_x);
+//     movement_component_2.acceleration_x =
+//     movement_component_1.acceleration_x;
+//   }
+//   if ((closest == RectangleSide::kTop &&
+//        movement_component_1.velocity_y >= 0)) {
+//     movement_component_1.velocity_y = 0;
+//     movement_component_1.is_grounded = true;
+//   }
+//   if ((closest == RectangleSide::kBottom &&
+//        movement_component_1.velocity_y < 0)) {
+//     movement_component_1.velocity_y = 0;
+//     movement_component_1.acceleration_y =
+//     -movement_component_1.acceleration_y;
+//   }
+// }
 
 void updateVelocityY(MovementComponent& movement, const float delta_time) {
   movement.velocity_y -= movement.acceleration_y * delta_time;
