@@ -2,18 +2,20 @@
 
 This is a work in progress. Having fun doing some hobby game programming in C++ with Raylib as a graphics library.
 
+As someone that works primarily in Python at work, this is a toy project with the aim of having fun learning about game programming patterns and design principles, while brushing up on modern C++ best practices and approaches, and gain familiarity with the C++20 standard.
+
+One thing I have learnt doing this is that developing a game engine is HARD. Even for a simple platformer there is a lot of domain specific knowledge and design patterns - so there is definitely a lot of room for improvement here!
+
 ## Features
 
 I have written my own 'engine' using ECS (Entity Component System) architecture to create:
 
 - Physics system with gravity, acceleration, velocity, and position
-- Basic collision detection using AABB
+- Basic collision detection using AABB overlap checks and resolution with minimum translation vectors
 - Texture and tilemap rendering
 - Input handling
 - Animation system
-- Tilemap editor / level design tool (in progress)
-
-This is a toy project to learn about game programming patterns and design principles, have fun brushing up on modern C++ best practices and approaches, and gain familiarity with the C++20 standard.
+- Tilemap editor / level design tool
 
 ## Getting Started
 
