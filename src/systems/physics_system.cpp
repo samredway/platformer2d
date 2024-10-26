@@ -1,6 +1,5 @@
 #include "systems/physics_system.h"
 
-#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -22,10 +21,11 @@ static MovementComponent IMMOVABLE("", 0, 0, 0, 0, 0, 0,
                                    true, true);
 
 // Forward declarations of free helper functions ////////////////////////////
-static RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
-                                             const Rectangle& collision_box_2);
-static void updateVelocityY(MovementComponent& movement, float delta_time);
-static void updateVelocityX(MovementComponent& movement, float delta_time);
+void updateVelocityY(MovementComponent& movement, const float delta_time);
+void updateVelocityX(MovementComponent& movement, const float delta_time);
+static Vector2 getOverlap(const Rectangle& r1, const Rectangle& r2);
+static Vector2 getMinimumTranslationVector(const Vector2& overlap,
+                                           const Vector2& direction);
 
 // Public methods /////////////////////////////////////////////////////////////
 PhysicsSystem::PhysicsSystem(
@@ -96,45 +96,32 @@ PhysicsSystem::PhysicsComponent PhysicsSystem::getPhysicsComponent(
 void PhysicsSystem::resolveCollisions(
     std::vector<PhysicsSystem::CollisionPair>& collisions) {
   for (auto& collision : collisions) {
-    const RectangleSide closest_side = getClosestRectangleSide(
-        collision.mover.collision.getCollisionBox(collision.mover.position),
-        collision.collider.collision.getCollisionBox(
-            collision.collider.position));
+    Rectangle mover_box =
+        collision.mover.collision.getCollisionBox(collision.mover.position);
+    Rectangle collider_box = collision.collider.collision.getCollisionBox(
+        collision.collider.position);
 
-    // apply an equal and opposite reaction (however we also articially set
-    // velocity to 0 to prevent glitches with overshoot)
-    // common sense guards before applying to stop collision still occuring
-    if (closest_side == RectangleSide::kLeft &&
-        // the player changes direction after initial collision
-        collision.mover.movement.velocity_x > 0) {
-      // todo these are wrong. we should not be setting the velocity to 0.
-      // we should be applying an appropriately sized opposite force to the
-      // mover which will result in a change in acceleration
-      // todo we need to calculate the force based on the mass of the objects
+    Vector2 overlap = getOverlap(mover_box, collider_box);
+    if (overlap.x == 0 && overlap.y == 0) continue;  // No collision
+
+    Vector2 direction = {mover_box.x < collider_box.x ? -1.0f : 1.0f,
+                         mover_box.y < collider_box.y ? -1.0f : 1.0f};
+
+    Vector2 mtv = getMinimumTranslationVector(overlap, direction);
+
+    // Apply the minimum translation vector
+    collision.mover.position.x += mtv.x;
+    collision.mover.position.y += mtv.y;
+
+    // Update velocity and grounded state
+    if (mtv.x != 0) {
       collision.mover.movement.velocity_x = 0;
-      collision.mover.movement.acceleration_x =
-          -std::abs(collision.mover.movement.acceleration_x);
-      collision.collider.movement.acceleration_x =
-          collision.mover.movement.acceleration_x;
     }
-    if (closest_side == RectangleSide::kRight &&
-        collision.mover.movement.velocity_x < 0) {
-      collision.mover.movement.velocity_x = 0;
-      collision.mover.movement.acceleration_x =
-          std::abs(collision.mover.movement.acceleration_x);
-      collision.collider.movement.acceleration_x =
-          collision.mover.movement.acceleration_x;
-    }
-    if ((closest_side == RectangleSide::kTop &&
-         collision.mover.movement.velocity_y >= 0)) {
+    if (mtv.y != 0) {
+      if (direction.y < 0) {  // Moving downwards
+        collision.mover.movement.is_grounded = true;
+      }
       collision.mover.movement.velocity_y = 0;
-      collision.mover.movement.is_grounded = true;
-    }
-    if ((closest_side == RectangleSide::kBottom &&
-         collision.mover.movement.velocity_y < 0)) {
-      collision.mover.movement.velocity_y = 0;
-      collision.mover.movement.acceleration_y =
-          -collision.mover.movement.acceleration_y;
     }
   }
 }
@@ -151,28 +138,25 @@ void PhysicsSystem::updatePosition(PhysicsComponent& mover) {
 }
 
 // Helper function implementations ////////////////////////////////////////////
-RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
-                                      const Rectangle& collision_box_2) {
-  const float bottom_diff =
-      std::abs(collision_box_2.y + collision_box_2.height) - collision_box_1.y;
-  const float top_diff =
-      std::abs(collision_box_1.y + collision_box_1.height) - collision_box_2.y;
-  const float left_diff =
-      std::abs(collision_box_1.x + collision_box_1.width) - collision_box_2.x;
-  const float right_diff =
-      std::abs((collision_box_2.x + collision_box_2.width) - collision_box_1.x);
+Vector2 getOverlap(const Rectangle& r1, const Rectangle& r2) {
+  float dx = (r1.x + r1.width / 2) - (r2.x + r2.width / 2);
+  float px = (r1.width + r2.width) / 2 - std::abs(dx);
+  if (px <= 0) return {0, 0};
 
-  const float min_dif =
-      std::min({bottom_diff, top_diff, left_diff, right_diff});
+  float dy = (r1.y + r1.height / 2) - (r2.y + r2.height / 2);
+  float py = (r1.height + r2.height) / 2 - std::abs(dy);
+  if (py <= 0) return {0, 0};
 
-  if (min_dif == bottom_diff)
-    return RectangleSide::kBottom;
-  else if (min_dif == top_diff)
-    return RectangleSide::kTop;
-  else if (min_dif == right_diff)
-    return RectangleSide::kRight;
-  else
-    return RectangleSide::kLeft;
+  return {px, py};
+}
+
+Vector2 getMinimumTranslationVector(const Vector2& overlap,
+                                    const Vector2& direction) {
+  if (overlap.x < overlap.y) {
+    return {overlap.x * direction.x, 0};
+  } else {
+    return {0, overlap.y * direction.y};
+  }
 }
 
 void updateVelocityY(MovementComponent& movement, const float delta_time) {
