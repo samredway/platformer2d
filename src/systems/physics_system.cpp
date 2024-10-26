@@ -16,9 +16,9 @@
 namespace platformer2d {
 
 // NULL movement component with infinite mass for immovable objects
-static MovementComponent IMMOVABLE("", 0, 0, 0, 0, 0, 0,
+static MovementComponent IMMOVABLE{"", 0, 0, 0, 0, 0, 0,
                                    std::numeric_limits<float>::infinity(), 0, 0,
-                                   0, true, true);
+                                   0, true, true};
 
 // Forward declarations of free helper functions ////////////////////////////
 void updateVelocityY(MovementComponent& movement, const float delta_time);
@@ -32,9 +32,9 @@ PhysicsSystem::PhysicsSystem(
     std::unordered_map<std::string, MovementComponent>& movement_components,
     std::unordered_map<std::string, PositionComponent>& position_components,
     std::unordered_map<std::string, CollisionComponent>& collision_components)
-    : movement_components_(movement_components),
-      position_components_(position_components),
-      collision_components_(collision_components) {}
+    : movement_components_{movement_components},
+      position_components_{position_components},
+      collision_components_{collision_components} {}
 
 void PhysicsSystem::update() {
   for (auto& movement_pair : movement_components_) {
