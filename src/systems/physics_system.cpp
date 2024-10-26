@@ -16,9 +16,9 @@
 namespace platformer2d {
 
 // NULL movement component with infinite mass for immovable objects
-static MovementComponent IMMOVABLE{"", 0, 0, 0, 0, 0, 0,
-                                   std::numeric_limits<float>::infinity(), 0, 0,
-                                   0, true, true};
+static MovementComponent IMMOVABLE{
+    "", 0, 0, 0,    0,   0, 0, std::numeric_limits<float>::infinity(),
+    0,  0, 0, true, true};
 
 // Forward declarations of free helper functions ////////////////////////////
 void updateVelocityY(MovementComponent& movement, const float delta_time);
@@ -64,9 +64,14 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
 
     Vector2 overlap = getOverlap(collision_box_1, collision_box_2);
     if (overlap.x > 0 && overlap.y > 0) {
+      // Determine the direction of the minimum translation vector (MTV)
+      // based on the relative positions of the collision boxes.
+      // -1.0f indicates a leftward or downward direction,
+      // 1.0f indicates a rightward or upward direction.
       Vector2 direction = {
           collision_box_1.x < collision_box_2.x ? -1.0f : 1.0f,
           collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
+
       Vector2 mtv = getMinimumTranslationVector(overlap, direction);
       collisions.push_back({mover, physics_component_2, mtv});
 
@@ -103,13 +108,16 @@ void PhysicsSystem::resolveCollisions(
     collision.mover.position.x += collision.mtv.x;
     collision.mover.position.y += collision.mtv.y;
 
-    // Update velocity
+    // Apply damping instead of setting velocity to zero helps to prevent
+    // jittering when objects are in contact.
+    const float damping_factor = 0.8f;
+
     if (collision.mtv.x != 0) {
-      collision.mover.movement.velocity_x = 0;
+      collision.mover.movement.velocity_x *= damping_factor;
       collision.mover.movement.acceleration_x = 0;
     }
     if (collision.mtv.y != 0) {
-      collision.mover.movement.velocity_y = 0;
+      collision.mover.movement.velocity_y *= damping_factor;
       collision.mover.movement.acceleration_y = 0;
     }
   }
@@ -167,12 +175,11 @@ Vector2 getMinimumTranslationVector(const Vector2& overlap,
 }
 
 void updateVelocityY(MovementComponent& movement, const float delta_time) {
-  movement.velocity_y -= movement.acceleration_y * delta_time;
-
   if (!movement.is_grounded) {
     movement.velocity_y += kGravity * delta_time;
-    movement.velocity_y -= movement.velocity_y * movement.drag;
   }
+  movement.velocity_y -= movement.acceleration_y * delta_time;
+  movement.velocity_y -= movement.velocity_y * movement.drag;
 }
 
 void updateVelocityX(MovementComponent& movement, const float delta_time) {
@@ -180,12 +187,12 @@ void updateVelocityX(MovementComponent& movement, const float delta_time) {
   movement.velocity_x -= movement.velocity_x * movement.drag;
 
   if (movement.is_grounded) {
-    if (movement.velocity_x > 0) {
-      movement.velocity_x -= movement.friction_coefficient * delta_time;
-      if (movement.velocity_x < 0) movement.velocity_x = 0;
-    } else if (movement.velocity_x < 0) {
-      movement.velocity_x += movement.friction_coefficient * delta_time;
-      if (movement.velocity_x > 0) movement.velocity_x = 0;
+    float friction_force = movement.friction_coefficient * delta_time;
+    // Dont apply friction if would reverse direction
+    if (std::abs(movement.velocity_x) < friction_force) {
+      movement.velocity_x = 0;
+    } else {
+      movement.velocity_x -= std::copysign(friction_force, movement.velocity_x);
     }
   }
 }
