@@ -32,7 +32,6 @@ class PhysicsSystem {
     PhysicsComponent& mover;
     const PhysicsComponent& collider;
     Vector2 mtv;
-    Vector2 direction;
   };
 
   std::unordered_map<std::string, MovementComponent>& movement_components_;

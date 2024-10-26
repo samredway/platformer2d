@@ -68,7 +68,7 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
           collision_box_1.x < collision_box_2.x ? -1.0f : 1.0f,
           collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
       Vector2 mtv = getMinimumTranslationVector(overlap, direction);
-      collisions.push_back({mover, physics_component_2, mtv, direction});
+      collisions.push_back({mover, physics_component_2, mtv});
 
       // Check if this collision grounds the mover
       if (direction.y < 0 && std::abs(mtv.y) > std::abs(mtv.x)) {
@@ -106,9 +106,11 @@ void PhysicsSystem::resolveCollisions(
     // Update velocity
     if (collision.mtv.x != 0) {
       collision.mover.movement.velocity_x = 0;
+      collision.mover.movement.acceleration_x = 0;
     }
     if (collision.mtv.y != 0) {
       collision.mover.movement.velocity_y = 0;
+      collision.mover.movement.acceleration_y = 0;
     }
   }
 }
@@ -125,18 +127,36 @@ void PhysicsSystem::updatePosition(PhysicsComponent& mover) {
 }
 
 // Helper function implementations ////////////////////////////////////////////
-Vector2 getOverlap(const Rectangle& r1, const Rectangle& r2) {
-  float dx = (r1.x + r1.width / 2) - (r2.x + r2.width / 2);
-  float px = (r1.width + r2.width) / 2 - std::abs(dx);
-  if (px <= 0) return {0, 0};
 
-  float dy = (r1.y + r1.height / 2) - (r2.y + r2.height / 2);
-  float py = (r1.height + r2.height) / 2 - std::abs(dy);
-  if (py <= 0) return {0, 0};
+// Calculate the overlap between two rectangles along the x and y axes.
+// Returns a Vector2 where x is the overlap along the x-axis and y is the
+// overlap along the y-axis. If there is no overlap, returns {0, 0} indicating
+// no collision.
+Vector2 getOverlap(const Rectangle& rect1, const Rectangle& rect2) {
+  // Calculate the horizontal distance between the centers of the rectangles
+  float centerDistX = (rect1.x + rect1.width / 2) - (rect2.x + rect2.width / 2);
+  // Calculate the potential overlap along the x-axis
+  float overlapX = (rect1.width + rect2.width) / 2 - std::abs(centerDistX);
+  // If overlapX is negative or zero, there is no horizontal overlap
+  if (overlapX <= 0) return {0, 0};
 
-  return {px, py};
+  // Calculate the vertical distance between the centers of the rectangles
+  float centerDistY =
+      (rect1.y + rect1.height / 2) - (rect2.y + rect2.height / 2);
+  // Calculate the potential overlap along the y-axis
+  float overlapY = (rect1.height + rect2.height) / 2 - std::abs(centerDistY);
+  // If overlapY is negative or zero, there is no vertical overlap
+  if (overlapY <= 0) return {0, 0};
+
+  // Return the overlap along both axes
+  return {overlapX, overlapY};
 }
 
+// Determines the minimum translation vector (MTV) needed to resolve a collision
+// between two objects. The MTV is the smallest vector that can be applied to
+// one of the objects to separate them along the axis of least penetration.
+// The function returns a vector that represents the MTV, which is calculated
+// based on the overlap and direction of the collision.
 Vector2 getMinimumTranslationVector(const Vector2& overlap,
                                     const Vector2& direction) {
   if (overlap.x < overlap.y) {
