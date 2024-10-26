@@ -1,7 +1,7 @@
 #include "systems/physics_system.h"
 
-#include <algorithm>
 #include <cmath>
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -15,18 +15,19 @@
 
 namespace platformer2d {
 
-// Forward declarations of free helper functions
-enum class RectangleSide;
-RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
-                                      const Rectangle& collision_box_2);
-void handleCollision(MovementComponent& movement_component,
-                     PositionComponent& position,
-                     const Rectangle& collision_box_1,
-                     const Rectangle& collision_box_2);
-void updateVelocityY(MovementComponent& movement, float delta_time);
-void updateVelocityX(MovementComponent& movement, float delta_time);
+// NULL movement component with infinite mass for immovable objects
+static MovementComponent IMMOVABLE("", 0, 0, 0, 0, 0, 0,
+                                   std::numeric_limits<float>::infinity(), 0, 0,
+                                   0, true, true);
 
-// Public methods
+// Forward declarations of free helper functions ////////////////////////////
+void updateVelocityY(MovementComponent& movement, const float delta_time);
+void updateVelocityX(MovementComponent& movement, const float delta_time);
+static Vector2 getOverlap(const Rectangle& r1, const Rectangle& r2);
+static Vector2 getMinimumTranslationVector(const Vector2& overlap,
+                                           const Vector2& direction);
+
+// Public methods /////////////////////////////////////////////////////////////
 PhysicsSystem::PhysicsSystem(
     std::unordered_map<std::string, MovementComponent>& movement_components,
     std::unordered_map<std::string, PositionComponent>& position_components,
@@ -36,126 +37,132 @@ PhysicsSystem::PhysicsSystem(
       collision_components_(collision_components) {}
 
 void PhysicsSystem::update() {
-  const float dt = GetFrameTime();
-
   for (auto& movement_pair : movement_components_) {
-    const std::string& mover_entity_tag = movement_pair.first;
-
-    MovementComponent& movement_component = movement_pair.second;
-    auto& position = getComponentOrPanic<PositionComponent>(
-        position_components_, mover_entity_tag);
-
-    std::vector<std::string> have_checked{mover_entity_tag};
-
-    movement_component.is_grounded = false;
-
-    for (const auto& collider_pair : collision_components_) {
-      if (std::find(have_checked.begin(), have_checked.end(),
-                    collider_pair.first) != have_checked.end()) {
-        continue;
-      }
-
-      // Get the collision components for the mover and the collider
-      const auto& collision_1 = getComponentOrPanic<CollisionComponent>(
-          collision_components_, mover_entity_tag);
-      const auto& collision_2 = collider_pair.second;
-
-      const PositionComponent& position2 =
-          getComponentOrPanic<PositionComponent>(position_components_,
-                                                 collider_pair.first);
-
-      const Rectangle collision_box_1 = collision_1.getCollisionBox(position);
-      const Rectangle collision_box_2 = collision_2.getCollisionBox(position2);
-
-      const bool is_colliding =
-          collision_box_1.x <= collision_box_2.x + collision_box_2.width &&
-          collision_box_1.x + collision_box_1.width >= collision_box_2.x &&
-          collision_box_1.y + collision_box_1.height >= collision_box_2.y &&
-          collision_box_1.y <= collision_box_2.y + collision_box_2.height;
-
-      if (is_colliding) {
-        handleCollision(movement_component, position, collision_box_1,
-                        collision_box_2);
-      }
-    }
-
-    // Update position after handling collisions
-    updateVelocityY(movement_component, dt);
-    position.y += movement_component.velocity_y;
-
-    updateVelocityX(movement_component, dt);
-    position.x += movement_component.velocity_x;
+    PhysicsComponent mover = getPhysicsComponent(movement_pair.first);
+    std::vector<CollisionPair> collisions = calculateCollisions(mover);
+    resolveCollisions(collisions);
+    updateVelocity(mover);
+    updatePosition(mover);
   }
 }
 
-// Helper function implementations
-enum class RectangleSide { kTop, kBottom, kRight, kLeft };
+// Private methods ////////////////////////////////////////////////////////////
+std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
+    PhysicsComponent& mover) {
+  std::vector<CollisionPair> collisions;
+  const auto& collision_box_1 = mover.collision.getCollisionBox(mover.position);
 
-RectangleSide getClosestRectangleSide(const Rectangle& collision_box_1,
-                                      const Rectangle& collision_box_2) {
-  const float bottom_diff =
-      std::abs(collision_box_2.y + collision_box_2.height) - collision_box_1.y;
-  const float top_diff =
-      std::abs(collision_box_1.y + collision_box_1.height) - collision_box_2.y;
-  const float left_diff =
-      std::abs(collision_box_1.x + collision_box_1.width) - collision_box_2.x;
-  const float right_diff =
-      std::abs((collision_box_2.x + collision_box_2.width) - collision_box_1.x);
+  // Reset grounded state at the beginning of collision checks
+  mover.movement.is_grounded = false;
 
-  const float min_dif =
-      std::min({bottom_diff, top_diff, left_diff, right_diff});
+  for (const auto& collider_pair : collision_components_) {
+    if (collider_pair.first == mover.position.entity_tag) continue;
 
-  if (min_dif == bottom_diff)
-    return RectangleSide::kBottom;
-  else if (min_dif == top_diff)
-    return RectangleSide::kTop;
-  else if (min_dif == right_diff)
-    return RectangleSide::kRight;
-  else
-    return RectangleSide::kLeft;
+    const auto& physics_component_2 = getPhysicsComponent(collider_pair.first);
+    const auto& collision_box_2 = physics_component_2.collision.getCollisionBox(
+        physics_component_2.position);
+
+    Vector2 overlap = getOverlap(collision_box_1, collision_box_2);
+    if (overlap.x > 0 && overlap.y > 0) {
+      Vector2 direction = {
+          collision_box_1.x < collision_box_2.x ? -1.0f : 1.0f,
+          collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
+      Vector2 mtv = getMinimumTranslationVector(overlap, direction);
+      collisions.push_back({mover, physics_component_2, mtv});
+
+      // Check if this collision grounds the mover
+      if (direction.y < 0 && std::abs(mtv.y) > std::abs(mtv.x)) {
+        mover.movement.is_grounded = true;
+      }
+    }
+  }
+
+  return collisions;
 }
 
-// Constants for collision offset which is the distance the mover is
-// offset from the collision object so as to not get stuck in the object
-constexpr float kCollisionOffset = 0.5f;
+PhysicsSystem::PhysicsComponent PhysicsSystem::getPhysicsComponent(
+    const std::string& entity_id) {
+  const auto& collision =
+      getComponentOrPanic<CollisionComponent>(collision_components_, entity_id);
+  auto& position =
+      getComponentOrPanic<PositionComponent>(position_components_, entity_id);
 
-void handleCollision(MovementComponent& movement_component,
-                     PositionComponent& position,
-                     const Rectangle& collision_box_1,
-                     const Rectangle& collision_box_2) {
-  RectangleSide closest =
-      getClosestRectangleSide(collision_box_1, collision_box_2);
+  // Try to get the movement component, use IMMOVABLE if not found
+  auto movement_opt =
+      tryGetComponent<MovementComponent>(movement_components_, entity_id);
+  MovementComponent& movement =
+      movement_opt.has_value() ? movement_opt->get() : IMMOVABLE;
 
-  // position x offset for mover
-  const float position_x_offset = std::abs(collision_box_1.x - position.x);
-  // TODO Need to handle cases where there is a y offset for the mover
-  // TODO Need to handle casee where the collider object has its own offset
+  return PhysicsComponent{collision, position, movement};
+}
 
-  switch (closest) {
-    // Mover has collided with the RectangleSide::x of the collider
-    case RectangleSide::kTop:
-      position.y = collision_box_2.y - collision_box_1.height;
-      movement_component.velocity_y = 0;
-      movement_component.is_grounded = true;
-      break;
-    case RectangleSide::kLeft:
-      position.x = collision_box_2.x - collision_box_1.width -
-                   position_x_offset - kCollisionOffset;
-      movement_component.velocity_x = 0;
-      movement_component.acceleration_x = 0;
-      break;
-    case RectangleSide::kRight:
-      position.x = collision_box_2.x + collision_box_2.width -
-                   position_x_offset + kCollisionOffset;
-      movement_component.velocity_x = 0;
-      movement_component.acceleration_x = 0;
-      break;
-    case RectangleSide::kBottom:
-      position.y =
-          collision_box_2.y + collision_box_2.height + kCollisionOffset;
-      movement_component.velocity_y = 0;
-      movement_component.acceleration_y = 0;
-      break;
+void PhysicsSystem::resolveCollisions(
+    std::vector<PhysicsSystem::CollisionPair>& collisions) {
+  for (auto& collision : collisions) {
+    // Apply the minimum translation vector
+    collision.mover.position.x += collision.mtv.x;
+    collision.mover.position.y += collision.mtv.y;
+
+    // Update velocity
+    if (collision.mtv.x != 0) {
+      collision.mover.movement.velocity_x = 0;
+      collision.mover.movement.acceleration_x = 0;
+    }
+    if (collision.mtv.y != 0) {
+      collision.mover.movement.velocity_y = 0;
+      collision.mover.movement.acceleration_y = 0;
+    }
+  }
+}
+
+void PhysicsSystem::updateVelocity(PhysicsComponent& mover) {
+  const float delta_time = GetFrameTime();
+  updateVelocityY(mover.movement, delta_time);
+  updateVelocityX(mover.movement, delta_time);
+}
+
+void PhysicsSystem::updatePosition(PhysicsComponent& mover) {
+  mover.position.x += mover.movement.velocity_x;
+  mover.position.y += mover.movement.velocity_y;
+}
+
+// Helper function implementations ////////////////////////////////////////////
+
+// Calculate the overlap between two rectangles along the x and y axes.
+// Returns a Vector2 where x is the overlap along the x-axis and y is the
+// overlap along the y-axis. If there is no overlap, returns {0, 0} indicating
+// no collision.
+Vector2 getOverlap(const Rectangle& rect1, const Rectangle& rect2) {
+  // Calculate the horizontal distance between the centers of the rectangles
+  float centerDistX = (rect1.x + rect1.width / 2) - (rect2.x + rect2.width / 2);
+  // Calculate the potential overlap along the x-axis
+  float overlapX = (rect1.width + rect2.width) / 2 - std::abs(centerDistX);
+  // If overlapX is negative or zero, there is no horizontal overlap
+  if (overlapX <= 0) return {0, 0};
+
+  // Calculate the vertical distance between the centers of the rectangles
+  float centerDistY =
+      (rect1.y + rect1.height / 2) - (rect2.y + rect2.height / 2);
+  // Calculate the potential overlap along the y-axis
+  float overlapY = (rect1.height + rect2.height) / 2 - std::abs(centerDistY);
+  // If overlapY is negative or zero, there is no vertical overlap
+  if (overlapY <= 0) return {0, 0};
+
+  // Return the overlap along both axes
+  return {overlapX, overlapY};
+}
+
+// Determines the minimum translation vector (MTV) needed to resolve a collision
+// between two objects. The MTV is the smallest vector that can be applied to
+// one of the objects to separate them along the axis of least penetration.
+// The function returns a vector that represents the MTV, which is calculated
+// based on the overlap and direction of the collision.
+Vector2 getMinimumTranslationVector(const Vector2& overlap,
+                                    const Vector2& direction) {
+  if (overlap.x < overlap.y) {
+    return {overlap.x * direction.x, 0};
+  } else {
+    return {0, overlap.y * direction.y};
   }
 }
 

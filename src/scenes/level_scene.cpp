@@ -54,6 +54,17 @@ void LevelScene::loadLevelFromFile() {
           tile_tag, PositionComponent{tile_tag, tile["x"], tile["y"]});
       collision_components_.emplace(
           tile_tag, CollisionComponent{tile_tag, kTileSize, kTileSize, 0, 0});
+
+      // This feels a bit hacky later on will want to be able to add
+      // characteristics to the tile in the level editor or tile picker but now
+      // just add directly here
+      if (tile["texture_name"] == "tile_winter_ice") {
+        MovementComponent mover{tile_tag};
+        mover.mass = 20.0f;
+        mover.friction_coefficient = 20.0f;
+        mover.is_grounded = true;
+        movement_components_.emplace(tile_tag, mover);
+      }
     }
   }
 }
@@ -74,15 +85,15 @@ void LevelScene::initPlayer() {
   player_animation.setStateToTextureName(AnimationState::kRunning,
                                          "pink_monster_run");
   player_animation.setStateToAnimationFPS(AnimationState::kIdle, 0.4f);
-  player_animation.setStateToAnimationFPS(AnimationState::kRunning, 0.1f);
+  player_animation.setStateToAnimationFPS(AnimationState::kRunning, 0.4f);
   animation_components_.emplace(playerTag, player_animation);
 }
 
 void LevelScene::update() {
   handleInput();
+  physics_.update();
   animation_state_system_.update();
   animation_system_.update();
-  physics_.update();
 }
 
 void LevelScene::draw() const {
@@ -105,8 +116,9 @@ void LevelScene::handleInput() {
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 
   // If player is in air we still allow them some left right
-  // movement cause ... game. But lets reduct it
-  const float movement_speed_divisor = player_movement.is_grounded ? 1.0 : 15.0;
+  // movement cause ... game. But lets reduct it with some arbitrary value
+  const float movement_speed_divisor =
+      player_movement.is_grounded ? 1.0 : player_movement.air_movement_divisor;
   const float rate_acceleration{
       (player_movement.walk_force / player_movement.mass) /
       movement_speed_divisor};

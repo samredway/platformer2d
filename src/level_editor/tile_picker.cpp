@@ -1,6 +1,6 @@
 #include "constants.h"
 #include "level_editor/tile_picker.h"
-#include "macros.h"
+#include "debug.h"
 #include "raylib.h"
 
 namespace platformer2d {

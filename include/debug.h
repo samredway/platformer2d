@@ -3,6 +3,8 @@
 #include <cstdlib>   // For std::abort
 #include <iostream>  // for std::cerr
 
+namespace platformer2d {
+
 #define CHECK(condition, errstring)                                    \
   do {                                                                 \
     if (!(condition)) {                                                \
@@ -20,7 +22,7 @@
 
 #define PANIC(err_message)                                           \
   do {                                                               \
-    std::cerr << "Panic: " << err_message << " in file " << __FILE__ \
+    std::cerr << "PANIC: " << err_message << " in file " << __FILE__ \
               << " at line " << __LINE__ << std::endl;               \
     std::abort();                                                    \
   } while (false)
@@ -33,3 +35,5 @@
 #else
 #define DLOG(message) ((void)0)
 #endif
+
+}  // namespace platformer2d
