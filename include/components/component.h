@@ -26,6 +26,17 @@ ComponentT& getComponentOrPanic(
   }
 }
 
+// Helper to retrieve optional component from component map
+template <typename ComponentT>
+std::optional<std::reference_wrapper<ComponentT>> tryGetComponent(
+    std::unordered_map<std::string, ComponentT>& components,
+    const std::string& tag) {
+  auto it = components.find(tag);
+  return it != components.end()
+             ? std::optional<std::reference_wrapper<ComponentT>>(it->second)
+             : std::nullopt;
+}
+
 struct Component {
   Component(std::string tag) : entity_tag(tag) {}
 
