@@ -51,29 +51,32 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
     PhysicsComponent& mover) {
   std::vector<CollisionPair> collisions;
   const auto& collision_box_1 = mover.collision.getCollisionBox(mover.position);
+  
+  // Reset grounded state at the beginning of collision checks
+  mover.movement.is_grounded = false;
 
-  // Check each mover against each collider
   for (const auto& collider_pair : collision_components_) {
-    // Skip self-collision
     if (collider_pair.first == mover.position.entity_tag) continue;
 
-    // Get components for the collider
     const auto& physics_component_2 = getPhysicsComponent(collider_pair.first);
     const auto& collision_box_2 = physics_component_2.collision.getCollisionBox(
         physics_component_2.position);
 
-    const bool is_colliding =
-        collision_box_1.x <= collision_box_2.x + collision_box_2.width &&
-        collision_box_1.x + collision_box_1.width >= collision_box_2.x &&
-        collision_box_1.y + collision_box_1.height >= collision_box_2.y &&
-        collision_box_1.y <= collision_box_2.y + collision_box_2.height;
-
-    if (is_colliding) {
-      collisions.push_back({mover, physics_component_2});
-    } else {
-      mover.movement.is_grounded = false;
+    Vector2 overlap = getOverlap(collision_box_1, collision_box_2);
+    if (overlap.x > 0 && overlap.y > 0) {
+      Vector2 direction = {
+          collision_box_1.x < collision_box_2.x ? -1.0f : 1.0f,
+          collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
+      Vector2 mtv = getMinimumTranslationVector(overlap, direction);
+      collisions.push_back({mover, physics_component_2, mtv, direction});
+      
+      // Check if this collision grounds the mover
+      if (direction.y < 0 && std::abs(mtv.y) > std::abs(mtv.x)) {
+        mover.movement.is_grounded = true;
+      }
     }
   }
+
   return collisions;
 }
 
@@ -96,31 +99,15 @@ PhysicsSystem::PhysicsComponent PhysicsSystem::getPhysicsComponent(
 void PhysicsSystem::resolveCollisions(
     std::vector<PhysicsSystem::CollisionPair>& collisions) {
   for (auto& collision : collisions) {
-    Rectangle mover_box =
-        collision.mover.collision.getCollisionBox(collision.mover.position);
-    Rectangle collider_box = collision.collider.collision.getCollisionBox(
-        collision.collider.position);
-
-    Vector2 overlap = getOverlap(mover_box, collider_box);
-    if (overlap.x == 0 && overlap.y == 0) continue;  // No collision
-
-    Vector2 direction = {mover_box.x < collider_box.x ? -1.0f : 1.0f,
-                         mover_box.y < collider_box.y ? -1.0f : 1.0f};
-
-    Vector2 mtv = getMinimumTranslationVector(overlap, direction);
-
     // Apply the minimum translation vector
-    collision.mover.position.x += mtv.x;
-    collision.mover.position.y += mtv.y;
+    collision.mover.position.x += collision.mtv.x;
+    collision.mover.position.y += collision.mtv.y;
 
-    // Update velocity and grounded state
-    if (mtv.x != 0) {
+    // Update velocity
+    if (collision.mtv.x != 0) {
       collision.mover.movement.velocity_x = 0;
     }
-    if (mtv.y != 0) {
-      if (direction.y < 0) {  // Moving downwards
-        collision.mover.movement.is_grounded = true;
-      }
+    if (collision.mtv.y != 0) {
       collision.mover.movement.velocity_y = 0;
     }
   }

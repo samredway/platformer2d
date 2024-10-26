@@ -29,8 +29,10 @@ class PhysicsSystem {
   };
 
   struct CollisionPair {
-    PhysicsComponent mover;
-    PhysicsComponent collider;
+    PhysicsComponent& mover;
+    const PhysicsComponent& collider;
+    Vector2 mtv;
+    Vector2 direction;
   };
 
   std::unordered_map<std::string, MovementComponent>& movement_components_;
