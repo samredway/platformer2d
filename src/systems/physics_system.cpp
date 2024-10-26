@@ -18,7 +18,7 @@ namespace platformer2d {
 // NULL movement component with infinite mass for immovable objects
 static MovementComponent IMMOVABLE("", 0, 0, 0, 0, 0, 0,
                                    std::numeric_limits<float>::infinity(), 0, 0,
-                                   true, true);
+                                   0, true, true);
 
 // Forward declarations of free helper functions ////////////////////////////
 void updateVelocityY(MovementComponent& movement, const float delta_time);
@@ -51,7 +51,7 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
     PhysicsComponent& mover) {
   std::vector<CollisionPair> collisions;
   const auto& collision_box_1 = mover.collision.getCollisionBox(mover.position);
-  
+
   // Reset grounded state at the beginning of collision checks
   mover.movement.is_grounded = false;
 
@@ -69,7 +69,7 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
           collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
       Vector2 mtv = getMinimumTranslationVector(overlap, direction);
       collisions.push_back({mover, physics_component_2, mtv, direction});
-      
+
       // Check if this collision grounds the mover
       if (direction.y < 0 && std::abs(mtv.y) > std::abs(mtv.x)) {
         mover.movement.is_grounded = true;

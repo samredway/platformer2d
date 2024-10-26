@@ -85,7 +85,7 @@ void LevelScene::initPlayer() {
   player_animation.setStateToTextureName(AnimationState::kRunning,
                                          "pink_monster_run");
   player_animation.setStateToAnimationFPS(AnimationState::kIdle, 0.4f);
-  player_animation.setStateToAnimationFPS(AnimationState::kRunning, 0.1f);
+  player_animation.setStateToAnimationFPS(AnimationState::kRunning, 0.4f);
   animation_components_.emplace(playerTag, player_animation);
 }
 
@@ -116,8 +116,9 @@ void LevelScene::handleInput() {
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 
   // If player is in air we still allow them some left right
-  // movement cause ... game. But lets reduct it
-  const float movement_speed_divisor = player_movement.is_grounded ? 1.0 : 15.0;
+  // movement cause ... game. But lets reduct it with some arbitrary value
+  const float movement_speed_divisor =
+      player_movement.is_grounded ? 1.0 : player_movement.air_movement_divisor;
   const float rate_acceleration{
       (player_movement.walk_force / player_movement.mass) /
       movement_speed_divisor};
