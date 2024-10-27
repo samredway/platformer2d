@@ -15,11 +15,6 @@
 
 namespace platformer2d {
 
-// NULL movement component with infinite mass for immovable objects
-static MovementComponent IMMOVABLE{
-    "", 0, 0, 0,    0,   0, 0, std::numeric_limits<float>::infinity(),
-    0,  0, 0, true, true};
-
 // Forward declarations of free helper functions ////////////////////////////
 void updateVelocityY(MovementComponent& movement, const float delta_time);
 void updateVelocityX(MovementComponent& movement, const float delta_time);
