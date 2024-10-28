@@ -1,15 +1,11 @@
 #include "systems/physics_system.h"
 
 #include <cmath>
-#include <limits>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-#include "components/collision_component.h"
 #include "components/component.h"
 #include "components/movement_component.h"
-#include "components/position_component.h"
 #include "constants.h"
 #include "raylib.h"
 
@@ -23,17 +19,24 @@ static Vector2 getMinimumTranslationVector(const Vector2& overlap,
                                            const Vector2& direction);
 
 // Public methods /////////////////////////////////////////////////////////////
-PhysicsSystem::PhysicsSystem(
+void PhysicsSystem::init(
     std::unordered_map<std::string, MovementComponent>& movement_components,
     std::unordered_map<std::string, PositionComponent>& position_components,
-    std::unordered_map<std::string, CollisionComponent>& collision_components)
-    : movement_components_{movement_components},
-      position_components_{position_components},
-      collision_components_{collision_components} {}
+    std::unordered_map<std::string, CollisionComponent>& collision_components) {
+  for (auto& [entity_id, movement] : movement_components) {
+    mover_components_.emplace_back(
+        movement, getComponentOrPanic(position_components, entity_id),
+        getComponentOrPanic(collision_components, entity_id));
+  }
+  for (auto& [entity_id, collision] : collision_components) {
+    collider_components_.emplace_back(
+        getComponentOrPanic(collision_components, entity_id),
+        getComponentOrPanic(position_components, entity_id));
+  }
+}
 
 void PhysicsSystem::update() {
-  for (auto& movement_pair : movement_components_) {
-    PhysicsComponent mover = getPhysicsComponent(movement_pair.first);
+  for (auto& mover : mover_components_) {
     std::vector<CollisionPair> collisions = calculateCollisions(mover);
     resolveCollisions(collisions);
     updateVelocity(mover);
@@ -42,20 +45,18 @@ void PhysicsSystem::update() {
 }
 
 // Private methods ////////////////////////////////////////////////////////////
-std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
-    PhysicsComponent& mover) {
+std::vector<CollisionPair> PhysicsSystem::calculateCollisions(
+    MoverComponentAggregate& mover) {
   std::vector<CollisionPair> collisions;
   const auto& collision_box_1 = mover.collision.getCollisionBox(mover.position);
 
   // Reset grounded state at the beginning of collision checks
   mover.movement.is_grounded = false;
 
-  for (const auto& collider_pair : collision_components_) {
-    if (collider_pair.first == mover.position.entity_tag) continue;
-
-    const auto& physics_component_2 = getPhysicsComponent(collider_pair.first);
-    const auto& collision_box_2 = physics_component_2.collision.getCollisionBox(
-        physics_component_2.position);
+  for (const auto& collider : collider_components_) {
+    if (collider.collision.entity_tag == mover.position.entity_tag) continue;
+    const auto& collision_box_2 =
+        collider.collision.getCollisionBox(collider.position);
 
     Vector2 overlap = getOverlap(collision_box_1, collision_box_2);
     if (overlap.x > 0 && overlap.y > 0) {
@@ -68,7 +69,7 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
           collision_box_1.y < collision_box_2.y ? -1.0f : 1.0f};
 
       Vector2 mtv = getMinimumTranslationVector(overlap, direction);
-      collisions.push_back({mover, physics_component_2, mtv});
+      collisions.push_back({mover, collider, mtv});
 
       // Check if this collision grounds the mover
       if (direction.y < 0 && std::abs(mtv.y) > std::abs(mtv.x)) {
@@ -76,28 +77,10 @@ std::vector<PhysicsSystem::CollisionPair> PhysicsSystem::calculateCollisions(
       }
     }
   }
-
   return collisions;
 }
 
-PhysicsSystem::PhysicsComponent PhysicsSystem::getPhysicsComponent(
-    const std::string& entity_id) {
-  const auto& collision =
-      getComponentOrPanic<CollisionComponent>(collision_components_, entity_id);
-  auto& position =
-      getComponentOrPanic<PositionComponent>(position_components_, entity_id);
-
-  // Try to get the movement component, use IMMOVABLE if not found
-  auto movement_opt =
-      tryGetComponent<MovementComponent>(movement_components_, entity_id);
-  MovementComponent& movement =
-      movement_opt.has_value() ? movement_opt->get() : IMMOVABLE;
-
-  return PhysicsComponent{collision, position, movement};
-}
-
-void PhysicsSystem::resolveCollisions(
-    std::vector<PhysicsSystem::CollisionPair>& collisions) {
+void PhysicsSystem::resolveCollisions(std::vector<CollisionPair>& collisions) {
   for (auto& collision : collisions) {
     // Apply the minimum translation vector
     collision.mover.position.x += collision.mtv.x;
@@ -118,13 +101,13 @@ void PhysicsSystem::resolveCollisions(
   }
 }
 
-void PhysicsSystem::updateVelocity(PhysicsComponent& mover) {
+void PhysicsSystem::updateVelocity(MoverComponentAggregate& mover) {
   const float delta_time = GetFrameTime();
   updateVelocityY(mover.movement, delta_time);
   updateVelocityX(mover.movement, delta_time);
 }
 
-void PhysicsSystem::updatePosition(PhysicsComponent& mover) {
+void PhysicsSystem::updatePosition(MoverComponentAggregate& mover) {
   mover.position.x += mover.movement.velocity_x;
   mover.position.y += mover.movement.velocity_y;
 }

@@ -16,17 +16,18 @@ const std::string playerTag{"player"};
 
 LevelScene::LevelScene(AssetManager& asset_manager, InputManager& input_manager)
     : Scene("level", SKYBLUE, asset_manager, input_manager),
-      physics_(movement_components_, position_components_,
-               collision_components_),
-      animation_system_(animation_components_, position_components_,
-                        movement_components_, asset_manager_),
-      animation_state_system_(animation_components_, movement_components_),
-      render_system_(position_components_, render_components_, asset_manager_) {
+      physics_{},
+      animation_system_{animation_components_, position_components_,
+                        movement_components_, asset_manager_},
+      animation_state_system_{animation_components_, movement_components_},
+      render_system_{position_components_, render_components_, asset_manager_} {
 }
 
 void LevelScene::init() {
   initPlayer();
   loadLevelFromFile();
+  physics_.init(movement_components_, position_components_,
+                collision_components_);
 }
 
 void LevelScene::loadLevelFromFile() {

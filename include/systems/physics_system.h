@@ -11,9 +11,9 @@ namespace platformer2d {
 enum class RectangleSide { kTop, kBottom, kRight, kLeft };
 
 struct MoverComponentAggregate {
-  const CollisionComponent& collision;
-  PositionComponent& position;
   MovementComponent& movement;
+  PositionComponent& position;
+  const CollisionComponent& collision;
 };
 
 struct ColliderComponentAggregate {
@@ -29,8 +29,12 @@ struct CollisionPair {
 
 class PhysicsSystem {
  public:
-  PhysicsSystem(std::vector<MoverComponentAggregate>& mover_components,
-                std::vector<ColliderComponentAggregate>& collider_components);
+  PhysicsSystem() = default;
+  void init(
+      std::unordered_map<std::string, MovementComponent>& movement_components,
+      std::unordered_map<std::string, PositionComponent>& position_components,
+      std::unordered_map<std::string, CollisionComponent>&
+          collision_components);
   void update();
 
  private:
