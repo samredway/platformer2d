@@ -4,7 +4,7 @@ This is a work in progress. Having fun doing some hobby game programming in C++ 
 
 As someone that works primarily in Python at work, this is a toy project with the aim of having fun learning about game programming patterns and design principles, while brushing up on modern C++ best practices and approaches, and gain familiarity with the C++20 standard.
 
-One thing I have learnt doing this is that developing a game engine is HARD. Even for a simple platformer there is a lot of domain specific knowledge and design patterns - so there is definitely a lot of room for improvement here!
+One thing I have learnt doing this is that developing a game engine is HARD. Even for a simple platformer there are a lot of domain specific algorithms and design patterns that need to be learnt and implemented - so there is definitely a lot of room for improvement here!
 
 ## Features
 
