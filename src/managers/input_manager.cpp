@@ -20,12 +20,12 @@ InputManager::InputManager()
 void InputManager::getInput() {
   is_right_ = IsKeyDown(KEY_RIGHT);
   is_left_ = IsKeyDown(KEY_LEFT);
-  is_space_ = IsKeyDown(KEY_SPACE);
+  is_space_ = IsKeyPressed(KEY_SPACE);
 
 // Level Editor stuff DEBUG build only
 #ifndef NDEBUG
-  is_e_pressed_ = IsKeyPressed(KEY_E) ? true : false;
-  is_s_pressed_ = IsKeyPressed(KEY_S) ? true : false;
+  is_e_pressed_ = IsKeyPressed(KEY_E);
+  is_s_pressed_ = IsKeyPressed(KEY_S);
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     is_mouse_clicked_ = true;
