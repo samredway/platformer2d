@@ -14,11 +14,19 @@ struct MoverComponentAggregate {
   MovementComponent& movement;
   PositionComponent& position;
   const CollisionComponent& collision;
+
+  MoverComponentAggregate(MovementComponent& move, PositionComponent& pos,
+                          const CollisionComponent& coll)
+      : movement{move}, position{pos}, collision{coll} {}
 };
 
 struct ColliderComponentAggregate {
   const CollisionComponent& collision;
   PositionComponent& position;
+
+  ColliderComponentAggregate(const CollisionComponent& coll,
+                             PositionComponent& pos)
+      : collision{coll}, position{pos} {}
 };
 
 struct CollisionPair {
@@ -46,6 +54,12 @@ class PhysicsSystem {
   void resolveCollisions(std::vector<CollisionPair>& collisions);
   void updateVelocity(MoverComponentAggregate& mover);
   void updatePosition(MoverComponentAggregate& mover);
+
+  static void updateVelocityY(MovementComponent& movement, float delta_time);
+  static void updateVelocityX(MovementComponent& movement, float delta_time);
+  static Vector2 getOverlap(const Rectangle& r1, const Rectangle& r2);
+  static Vector2 getMinimumTranslationVector(const Vector2& overlap,
+                                             const Vector2& direction);
 };
 
 }  // namespace platformer2d
