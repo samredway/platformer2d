@@ -117,7 +117,7 @@ void LevelScene::handleInput() {
       getComponentOrPanic<MovementComponent>(movement_components_, playerTag);
 
   // If player is in air we still allow them some left right
-  // movement cause ... game. But lets reduct it with some arbitrary value
+  // movement cause ... game. But lets reduce it with some arbitrary value
   const float movement_speed_divisor =
       player_movement.is_grounded ? 1.0 : player_movement.air_movement_divisor;
   const float rate_acceleration{
@@ -138,9 +138,7 @@ void LevelScene::handleInput() {
     player_movement.acceleration_x = 0;
     // Artbitrary decelleration rate to mimic players own force in
     // slowing down
-    if (player_movement.is_grounded) {
-      player_movement.velocity_x *= 0.90;
-    }
+    player_movement.velocity_x *= 0.90;
   }
 
   // Jump

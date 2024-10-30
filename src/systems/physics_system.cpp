@@ -77,11 +77,9 @@ void PhysicsSystem::resolveCollisions(std::vector<CollisionPair>& collisions) {
 
     if (collision.mtv.x != 0) {
       collision.mover.movement.velocity_x *= damping_factor;
-      collision.mover.movement.acceleration_x = 0;
     }
     if (collision.mtv.y != 0) {
       collision.mover.movement.velocity_y *= damping_factor;
-      collision.mover.movement.acceleration_y = 0;
     }
   }
 }
